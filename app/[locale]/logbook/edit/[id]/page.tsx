@@ -1,30 +1,39 @@
 "use client";
 
 import React from "react";
-import { Box, Select, TextField } from "@mui/material";
-import MenuItem from "@mui/material/MenuItem";
+import { Box, MenuItem, Select, TextField } from "@mui/material";
+import Autocomplete from "@mui/material/Autocomplete";
 import { Edit, useAutocomplete } from "@refinedev/mui";
 import { useForm } from "@refinedev/react-hook-form";
 import { Controller } from "react-hook-form";
+
+// Define a type for the resource options.
+interface ResourceOption {
+  resource_id: string;
+  resource: string;
+}
 
 export default function LogbookEdit() {
   const {
     saveButtonProps,
     refineCore: { queryResult, formLoading },
-    handleSubmit,
     register,
     control,
     formState: { errors },
   } = useForm({
-    // Removed the unsupported "resource" property.
     refineCoreProps: {
-      meta: {
-        select: "*",
-      },
+      meta: { select: "*" },
     },
   });
 
+  // Get current logbook data if needed for defaults.
   const logbookData = queryResult?.data?.data;
+
+  // Setup autocomplete for resource selection.
+  const { autocompleteProps: resourceAutocompleteProps } = useAutocomplete({
+    resource: "resources",
+    defaultValue: logbookData?.resource, // Adjust if the field is an ID or object.
+  });
 
   return (
     <Edit isLoading={formLoading} saveButtonProps={saveButtonProps}>
@@ -33,11 +42,9 @@ export default function LogbookEdit() {
         sx={{ display: "flex", flexDirection: "column", gap: 2 }}
         autoComplete="off"
       >
-        {/* Date */}
+        {/* Date Field */}
         <TextField
-          {...register("date", {
-            required: "Date is required",
-          })}
+          {...register("date", { required: "Date is required" })}
           error={!!errors.date}
           helperText={errors.date ? String(errors.date.message) : ""}
           margin="normal"
@@ -50,9 +57,7 @@ export default function LogbookEdit() {
 
         {/* Pilot in Command */}
         <TextField
-          {...register("pic", {
-            required: "Pilot in Command is required",
-          })}
+          {...register("pic", { required: "Pilot in Command is required" })}
           error={!!errors.pic}
           helperText={errors.pic ? String(errors.pic.message) : ""}
           margin="normal"
@@ -62,12 +67,44 @@ export default function LogbookEdit() {
           name="pic"
         />
 
+        {/* Resource Selection */}
+        <Controller
+          name="resource"
+          control={control}
+          rules={{ required: "Resource is required" }}
+          defaultValue={logbookData?.resource || null}
+          render={({ field }: { field: any }) => (
+            <Autocomplete<ResourceOption, false, false, false>
+              {...resourceAutocompleteProps}
+              {...field}
+              onChange={(_, value) => {
+                // Cast value to ResourceOption to access "id"
+                field.onChange((value as ResourceOption)?.resource_id ?? value);
+              }}
+              getOptionLabel={(item) =>
+                typeof item === "string" ? item : (item as ResourceOption).resource
+              }
+              isOptionEqualToValue={(option, value) => {
+                return option.resource_id === (value as ResourceOption).resource_id;
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Resource"
+                  margin="normal"
+                  variant="outlined"
+                  error={!!errors.resource}
+                  helperText={errors.resource ? String(errors.resource.message) : ""}
+                  required
+                />
+              )}
+            />
+          )}
+        />
+
         {/* Passengers */}
         <TextField
-          {...register("pax", {
-            required: "Passengers is required",
-            valueAsNumber: true,
-          })}
+          {...register("pax", { required: "Passengers is required", valueAsNumber: true })}
           error={!!errors.pax}
           helperText={errors.pax ? String(errors.pax.message) : ""}
           margin="normal"
@@ -80,9 +117,7 @@ export default function LogbookEdit() {
 
         {/* Departure */}
         <TextField
-          {...register("departure", {
-            required: "Departure is required",
-          })}
+          {...register("departure", { required: "Departure is required" })}
           error={!!errors.departure}
           helperText={errors.departure ? String(errors.departure.message) : ""}
           margin="normal"
@@ -94,9 +129,7 @@ export default function LogbookEdit() {
 
         {/* Arrival */}
         <TextField
-          {...register("arrival", {
-            required: "Arrival is required",
-          })}
+          {...register("arrival", { required: "Arrival is required" })}
           error={!!errors.arrival}
           helperText={errors.arrival ? String(errors.arrival.message) : ""}
           margin="normal"
@@ -108,9 +141,7 @@ export default function LogbookEdit() {
 
         {/* Offblock */}
         <TextField
-          {...register("offblock", {
-            required: "Offblock is required",
-          })}
+          {...register("offblock", { required: "Offblock is required" })}
           error={!!errors.offblock}
           helperText={errors.offblock ? String(errors.offblock.message) : ""}
           margin="normal"
@@ -123,9 +154,7 @@ export default function LogbookEdit() {
 
         {/* Takeoff */}
         <TextField
-          {...register("takeoff", {
-            required: "Takeoff is required",
-          })}
+          {...register("takeoff", { required: "Takeoff is required" })}
           error={!!errors.takeoff}
           helperText={errors.takeoff ? String(errors.takeoff.message) : ""}
           margin="normal"
@@ -138,9 +167,7 @@ export default function LogbookEdit() {
 
         {/* Landing */}
         <TextField
-          {...register("landing", {
-            required: "Landing is required",
-          })}
+          {...register("landing", { required: "Landing is required" })}
           error={!!errors.landing}
           helperText={errors.landing ? String(errors.landing.message) : ""}
           margin="normal"
@@ -153,9 +180,7 @@ export default function LogbookEdit() {
 
         {/* Onblock */}
         <TextField
-          {...register("onblock", {
-            required: "Onblock is required",
-          })}
+          {...register("onblock", { required: "Onblock is required" })}
           error={!!errors.onblock}
           helperText={errors.onblock ? String(errors.onblock.message) : ""}
           margin="normal"
@@ -168,10 +193,7 @@ export default function LogbookEdit() {
 
         {/* Landings */}
         <TextField
-          {...register("landings", {
-            required: "Landings is required",
-            valueAsNumber: true,
-          })}
+          {...register("landings", { required: "Landings is required", valueAsNumber: true })}
           error={!!errors.landings}
           helperText={errors.landings ? String(errors.landings.message) : ""}
           margin="normal"
@@ -198,10 +220,7 @@ export default function LogbookEdit() {
 
         {/* Fuel */}
         <TextField
-          {...register("fuel", {
-            required: "Fuel is required",
-            valueAsNumber: true,
-          })}
+          {...register("fuel", { required: "Fuel is required", valueAsNumber: true })}
           error={!!errors.fuel}
           helperText={errors.fuel ? String(errors.fuel.message) : ""}
           margin="normal"
@@ -214,9 +233,7 @@ export default function LogbookEdit() {
 
         {/* Flight Type */}
         <TextField
-          {...register("flight_type", {
-            required: "Flight Type is required",
-          })}
+          {...register("flight_type", { required: "Flight Type is required" })}
           error={!!errors.flight_type}
           helperText={errors.flight_type ? String(errors.flight_type.message) : ""}
           margin="normal"
@@ -228,9 +245,7 @@ export default function LogbookEdit() {
 
         {/* Details */}
         <TextField
-          {...register("details", {
-            required: "Details is required",
-          })}
+          {...register("details", { required: "Details is required" })}
           error={!!errors.details}
           helperText={errors.details ? String(errors.details.message) : ""}
           margin="normal"

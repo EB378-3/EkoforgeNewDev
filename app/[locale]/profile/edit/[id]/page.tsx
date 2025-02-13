@@ -1,132 +1,167 @@
 "use client";
 
-import { Autocomplete, Box, Select, TextField } from "@mui/material";
-import MenuItem from "@mui/material/MenuItem";
-import { Edit, useAutocomplete } from "@refinedev/mui";
+import React, { useEffect } from "react";
+import { Box, TextField, Typography } from "@mui/material";
+import { Edit } from "@refinedev/mui";
 import { useForm } from "@refinedev/react-hook-form";
-import { Controller } from "react-hook-form";
 
-export default function BlogPostEdit() {
+interface ProfileData {
+  email: string;
+  username: string;
+  fullname: string;
+  phone: string;
+  streetaddress: string;
+  city: string;
+  country: string;
+  zip: string;
+  role: string;
+  NF: boolean;
+  IR: boolean;
+}
+
+export default function ProfileEdit() {
   const {
     saveButtonProps,
-    refineCore: { queryResult, formLoading, onFinish },
-    handleSubmit,
+    refineCore: { queryResult, formLoading },
     register,
-    control,
+    reset,
     formState: { errors },
-  } = useForm({
-    refineCoreProps: {
-      meta: {
-        select: "*, categories(id,title)",
-      },
-    },
+  } = useForm<ProfileData>({
+    defaultValues: {},
+    refineCoreProps: { meta: { select: "*" } },
   });
 
-  const blogPostsData = queryResult?.data?.data;
+  // Get current profile data if available for defaults.
+  const profileData = queryResult?.data?.data as ProfileData | undefined;
 
-  const { autocompleteProps: categoryAutocompleteProps } = useAutocomplete({
-    resource: "categories",
-    defaultValue: blogPostsData?.categories?.id,
-  });
+  // Reset form values when profile data is fetched.
+  useEffect(() => {
+    if (profileData) {
+      reset(profileData);
+    }
+  }, [profileData, reset]);
+
+  // If loading or no profile data yet, display a loading state.
+  if (formLoading || !profileData) {
+    return <Typography>Loading...</Typography>;
+  }
 
   return (
     <Edit isLoading={formLoading} saveButtonProps={saveButtonProps}>
       <Box
         component="form"
-        sx={{ display: "flex", flexDirection: "column" }}
+        sx={{ display: "flex", flexDirection: "column", gap: 2 }}
         autoComplete="off"
       >
+        {/* Email */}
         <TextField
-          {...register("title", {
-            required: "This field is required",
-          })}
-          error={!!(errors as any)?.title}
-          helperText={(errors as any)?.title?.message}
+          {...register("email", { required: "Email is required" })}
+          error={!!errors.email}
+          helperText={errors.email ? String(errors.email.message) : ""}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}
-          type="text"
-          label={"Title"}
-          name="title"
+          label="Email"
         />
-        <Controller
-          control={control}
-          name={"categoryId"}
-          rules={{ required: "This field is required" }}
-          // eslint-disable-next-line
-          defaultValue={null as any}
-          render={({ field }) => (
-            <Autocomplete
-              {...categoryAutocompleteProps}
-              {...field}
-              onChange={(_, value) => {
-                field.onChange(value.id);
-              }}
-              getOptionLabel={(item) => {
-                return (
-                  categoryAutocompleteProps?.options?.find((p) => {
-                    const itemId =
-                      typeof item === "object"
-                        ? item?.id?.toString()
-                        : item?.toString();
-                    const pId = p?.id?.toString();
-                    return itemId === pId;
-                  })?.title ?? ""
-                );
-              }}
-              isOptionEqualToValue={(option, value) => {
-                const optionId = option?.id?.toString();
-                const valueId =
-                  typeof value === "object"
-                    ? value?.id?.toString()
-                    : value?.toString();
-                return value === undefined || optionId === valueId;
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={"Category"}
-                  margin="normal"
-                  variant="outlined"
-                  error={!!(errors as any)?.categories?.id}
-                  helperText={(errors as any)?.categories?.id?.message}
-                  required
-                />
-              )}
-            />
-          )}
-        />
-        <Controller
-          name="status"
-          control={control}
-          render={({ field }) => {
-            return (
-              <Select
-                {...field}
-                value={field?.value || "draft"}
-                label={"Status"}
-              >
-                <MenuItem value="draft">Draft</MenuItem>
-                <MenuItem value="published">Published</MenuItem>
-                <MenuItem value="rejected">Rejected</MenuItem>
-              </Select>
-            );
-          }}
-        />
+
+        {/* Username */}
         <TextField
-          {...register("content", {
-            required: "This field is required",
-          })}
-          error={!!(errors as any)?.content}
-          helperText={(errors as any)?.content?.message}
+          {...register("username", { required: "Username is required" })}
+          error={!!errors.username}
+          helperText={errors.username ? String(errors.username.message) : ""}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}
-          multiline
-          label={"Content"}
-          name="content"
-          rows={4}
+          label="Username"
         />
+
+        {/* Full Name */}
+        <TextField
+          {...register("fullname", { required: "Full Name is required" })}
+          error={!!errors.fullname}
+          helperText={errors.fullname ? String(errors.fullname.message) : ""}
+          margin="normal"
+          fullWidth
+          InputLabelProps={{ shrink: true }}
+          label="Full Name"
+        />
+
+        {/* Phone */}
+        <TextField
+          {...register("phone", { required: "Phone is required" })}
+          error={!!errors.phone}
+          helperText={errors.phone ? String(errors.phone.message) : ""}
+          margin="normal"
+          fullWidth
+          InputLabelProps={{ shrink: true }}
+          label="Phone"
+        />
+
+        {/* Street Address */}
+        <TextField
+          {...register("streetaddress", { required: "Street Address is required" })}
+          error={!!errors.streetaddress}
+          helperText={errors.streetaddress ? String(errors.streetaddress.message) : ""}
+          margin="normal"
+          fullWidth
+          InputLabelProps={{ shrink: true }}
+          label="Street Address"
+        />
+
+        {/* City */}
+        <TextField
+          {...register("city", { required: "City is required" })}
+          error={!!errors.city}
+          helperText={errors.city ? String(errors.city.message) : ""}
+          margin="normal"
+          fullWidth
+          InputLabelProps={{ shrink: true }}
+          label="City"
+        />
+
+        {/* Country */}
+        <TextField
+          {...register("country", { required: "Country is required" })}
+          error={!!errors.country}
+          helperText={errors.country ? String(errors.country.message) : ""}
+          margin="normal"
+          fullWidth
+          InputLabelProps={{ shrink: true }}
+          label="Country"
+        />
+
+        {/* Zip Code */}
+        <TextField
+          {...register("zip", { required: "Zip is required" })}
+          error={!!errors.zip}
+          helperText={errors.zip ? String(errors.zip.message) : ""}
+          margin="normal"
+          fullWidth
+          InputLabelProps={{ shrink: true }}
+          label="Zip Code"
+        />
+
+        {/* Role */}
+        <TextField
+          {...register("role", { required: "Role is required" })}
+          error={!!errors.role}
+          helperText={errors.role ? String(errors.role.message) : ""}
+          margin="normal"
+          fullWidth
+          InputLabelProps={{ shrink: true }}
+          label="Role"
+        />
+
+        {/* Qualifications */}
+        <Typography variant="body1" sx={{ mt: 2 }}>
+          Qualifications
+        </Typography>
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+          <Typography variant="body2">NF</Typography>
+          <input type="checkbox" {...register("NF")} />
+          <Typography variant="body2">IR</Typography>
+          <input type="checkbox" {...register("IR")} />
+        </Box>
       </Box>
     </Edit>
   );

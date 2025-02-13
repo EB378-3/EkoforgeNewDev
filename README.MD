@@ -52,3 +52,5 @@ npm install @radix-ui/react-dropdown-menu lucide-react
 Framer motion
 next-intl
 npm i sharp
+npm install @fullcalendar/react @fullcalendar/daygrid @fullcalendar/timegrid @fullcalendar/interaction @fullcalendar/core
+npm i date-fns

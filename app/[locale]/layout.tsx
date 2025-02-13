@@ -103,14 +103,12 @@ export default async function RootLayout({
                       notificationProvider={useNotificationProvider}
                       resources={[
                         {
-                          name: "members",//Rescource table
-                          list: `/${locale}/members`,
-                          create: `/${locale}/members/create`,
-                          edit: `/${locale}/members/edit/:id`,
-                          show: `/${locale}/members/show/:id`,
+                          name: "profiles",
+                          list: `/${locale}/profile`,
+                          edit: `/${locale}/profile/edit/:id`,
                           meta: {
-                            icon: <HomeIcon />,
-                            label: "Home",
+                            icon: <AccountBoxIcon />,
+                            label: "Profile",
                           },
                         },
                         {
@@ -125,20 +123,35 @@ export default async function RootLayout({
                           },
                         },
                         {
-                          name: "profiles",
-                          list: `/${locale}/profile`,
-                          edit: `/${locale}/profile/edit/:id`,
-                          show: `/${locale}/profile/show/:id`,
-                          meta: {
-                            icon: <AccountBoxIcon />,
-                          },
-                        },
-                        {
-                          name: "booking",
+                          name: "cal",
                           list: `/${locale}/booking`,
                           create: `/${locale}/booking/create`,
                           edit: `/${locale}/booking/edit/:id`,
                           show: `/${locale}/booking/show/:id`,
+                          meta: {
+                            canDelete: true,
+                            icon: <CalendarMonthIcon />,
+                            label: "Bookings",
+                          },
+                        },
+                        {
+                          name: "Admin",
+                          list: `/${locale}/admin`,
+                          create: `/${locale}/admin/create`,
+                          edit: `/${locale}/admin/edit/:id`,
+                          show: `/${locale}/admin/show/:id`,
+                          meta: {
+                            canDelete: true,
+                            icon: <CalendarMonthIcon />,
+                            label: "Admin",
+                          },
+                        },
+                        {
+                          name: "resources",
+                          list: `/${locale}/resource`,
+                          create: `/${locale}/resource/create`,
+                          edit: `/${locale}/resource/edit/:id`,
+                          show: `/${locale}/resource/show/:id`,
                           meta: {
                             canDelete: true,
                             icon: <CalendarMonthIcon />,
