@@ -55,8 +55,8 @@ const Navbar: React.FC<NavbarProps> = ({ locale }) => {
   const navLinks = [
     { label: t("recource-selction"), href: `/${currentLocale}/#recource-selction` },
     { label: t("contact"), href: `/${currentLocale}/#contact` },
-    { label: t("bookDiscoveryFlight"), href: `/${currentLocale}/book` },
-    { label: t("members"), href: `/${currentLocale}/profile` },
+    { label: t("bookDiscoveryFlight"), href: `/${currentLocale}/web` },
+    { label: t("members"), href: `/${currentLocale}/book` },
   ];
 
   return (
@@ -64,7 +64,7 @@ const Navbar: React.FC<NavbarProps> = ({ locale }) => {
       component="nav"
       sx={{
         width: "100%",
-        background: `linear-gradient(360deg, ${theme.palette.primary.dark}, ${theme.palette.primary.light})`,
+        background: `linear-gradient(360deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
         color: theme.palette.primary.contrastText,
       }}
     >

@@ -10,12 +10,10 @@ import { motion } from "framer-motion";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import { useTheme } from "@mui/material/styles";
 
 const Hero = () => {
   const t = useTranslations("HomePage");
   const locale = useLocale();
-  const theme = useTheme();
 
   // Framer-motion animation variants
   const fadeIn = {

@@ -80,17 +80,17 @@ const Footer = () => {
                   underline="hover"
                   sx={{ color: theme.palette.grey[300] }}
                 >
-                  {t("aircraft options")}
+                  {t("testimonials")}
                 </Link>
               </Box>
               <Box component="li" sx={{ mb: 1 }}>
                 <Link
                   component={NextLink}
-                  href={`/${locale}/#testimonials`}
+                  href={`/${locale}/web`}
                   underline="hover"
                   sx={{ color: theme.palette.grey[300] }}
                 >
-                  {t("testimonials")}
+                  {t("webexamples")}
                 </Link>
               </Box>
               <Box component="li" sx={{ mb: 1 }}>
@@ -115,7 +115,7 @@ const Footer = () => {
               <Box component="li" sx={{ mb: 1 }}>
                 <Link
                   component={NextLink}
-                  href="https://www.instagram.com/pilotpathwayhel/"
+                  href="https://www.instagram.com/eko._forge/"
                   underline="hover"
                   sx={{ color: theme.palette.grey[300] }}
                 >
@@ -125,7 +125,7 @@ const Footer = () => {
               <Box component="li" sx={{ mb: 1 }}>
                 <Link
                   component={NextLink}
-                  href="https://www.facebook.com/pilotpathwayhel"
+                  href="https://www.facebook.com/eko._forge"
                   underline="hover"
                   sx={{ color: theme.palette.grey[300] }}
                 >
@@ -135,7 +135,7 @@ const Footer = () => {
               <Box component="li" sx={{ mb: 1 }}>
                 <Link
                   component={NextLink}
-                  href="https://www.linkedin.com/company/pilotpathwayhel"
+                  href="https://www.linkedin.com/company/ekoforge"
                   underline="hover"
                   sx={{ color: theme.palette.grey[300] }}
                 >
@@ -159,6 +159,16 @@ const Footer = () => {
                   sx={{ color: theme.palette.grey[300] }}
                 >
                   {t("about")}
+                </Link>
+              </Box>
+              <Box component="li" sx={{ mb: 1 }}>
+                <Link
+                  component={NextLink}
+                  href={`/${locale}/profile`}
+                  underline="hover"
+                  sx={{ color: theme.palette.grey[300] }}
+                >
+                  {t("login")}
                 </Link>
               </Box>
             </Box>
