@@ -11,7 +11,7 @@ export default function PlaneScrollIndicator() {
   const theme = useTheme();
 
   // Map scroll progress (0 to 1) to a width (0% to 100%)
-  const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "200%"]);
+  const progressWidth = useTransform(scrollYProgress, [1, 0], ["0%", "200%"]);
 
   return (
     <Box

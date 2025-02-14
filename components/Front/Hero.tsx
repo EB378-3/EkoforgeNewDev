@@ -5,15 +5,21 @@ import { useTranslations, useLocale } from "next-intl";
 import NextLink from "next/link";
 import NextImage from "next/image";
 import { motion } from "framer-motion";
+import { useTheme } from "@mui/material/styles";
+import { useColorMode } from "@contexts/color-mode";
 
 // MUI components
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
+import { getTheme } from "@theme/theme";
 
 const Hero = () => {
   const t = useTranslations("HomePage");
   const locale = useLocale();
+  const { mode, setMode } = useColorMode();
+  const theme = getTheme(mode);
+    
 
   // Framer-motion animation variants
   const fadeIn = {
@@ -48,7 +54,7 @@ const Hero = () => {
           inset: 0,
           // Note: to use theme values you might want to access the theme directly via useTheme,
           // here we are using a string literal for simplicity.
-          backgroundColor: "black",
+          backgroundColor: theme.palette.background.default,
         }}
       >
         <NextImage

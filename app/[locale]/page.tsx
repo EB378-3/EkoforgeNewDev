@@ -8,7 +8,7 @@ import NextLink from "next/link";
 import Hero from "@components/Front/Hero";
 import { motion } from "framer-motion";
 import Contact from "@components/Front/Contact";
-import AircraftOptions from "@components/Front/AircraftOptions";
+import Testimonials from "@components/Front/Testimonials";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
@@ -47,12 +47,12 @@ export default function IndexPage() {
       {
         title: t("Cost-Effective Pricing"),
         detail: `${t("twoOne")}\n${t("twoTwo")}\n${t("twoThree")}\n${t("twoFour")}`,
-        gradient: `linear-gradient(to bottom, ${theme.palette.grey[100]}, ${theme.palette.grey[100]})`,
+        gradient: `linear-gradient(to top, ${theme.palette.primary.dark}, ${theme.palette.primary.light})`,
       },
       {
         title: t("Beautiful Destinations"),
         detail: t("Fly to stunning locations around Southern Finland"),
-        gradient: `linear-gradient(to bottom, ${theme.palette.secondary.light}, ${theme.palette.secondary.dark})`,
+        gradient: `linear-gradient(to top, ${theme.palette.primary.dark}, ${theme.palette.primary.light})`,
       },
     ];
 
@@ -91,12 +91,12 @@ export default function IndexPage() {
           {/* Problem-Solution Section */}
           <Container sx={{ mt: 8, textAlign: "center", px: { xs: 2, sm: 3, lg: 6 } }}>
             <motion.div initial="hidden" whileInView="visible" variants={slideInRight}>
-              <Typography variant="h3" sx={{ fontWeight: "bold", mb: 6 }}>
-                {t("disrupt")}<br />
+              <Typography variant="h4" sx={{ fontWeight: "bold", mb: 6 }}>
+                {t("disrupt")}
                 <Box
                   component="span"
                   sx={{
-                    backgroundColor: theme.palette.secondary.main,
+                    backgroundColor: theme.palette.secondary.dark,
                     px: 2,
                     color: "#fff",
                     borderRadius: 2,
@@ -105,7 +105,7 @@ export default function IndexPage() {
                     textShadow: "0 2px 4px rgba(0,0,0,0.5)",
                   }}
                 >
-                  {t("loosing clients")}
+                {t("loosing clients")}
                 </Box>
               </Typography>
             </motion.div>
@@ -194,7 +194,7 @@ export default function IndexPage() {
 
           {/* Testimonials Section */}
           <motion.div initial="hidden" whileInView="visible" variants={fadeInUp}>
-            <AircraftOptions />
+            <Testimonials />
           </motion.div>
 
           {/* Plane Light Up Component */}

@@ -43,6 +43,7 @@
     "next-intl": "^3.26.3",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "react-player": "^2.16.0",
     "sharp": "^0.33.5"
   },
   "devDependencies": {

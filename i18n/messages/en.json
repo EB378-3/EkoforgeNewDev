@@ -14,10 +14,10 @@
       "twoThree": "✔ Mobile-friendly & fast – Looks amazing on every device.",
       "twoFour": "✔ No hidden costs – Transparent, small-business-friendly pricing.",
       "Beautiful Destinations": "Skip the DIY Frustration",
-      "Fly to stunning locations around Southern Finland": "Fly to stunning locations around Southern Finland.",
-      "Start Your Adventure Today": "Start Your Adventure Today",
-      "Discover the freedom of flight": "Discover the freedom of affordable aircraft rentals.",
-      "Book Now": "Book a Flight"
+      "Fly to stunning locations around Southern Finland": "Website builders give you tools. We give you results. Instead of spending hours trying to figure it out yourself, get a website that actually grows your business—without lifting a finger.",
+      "Start Your Adventure Today": "Get Online & Start Winning Today",
+      "Discover the freedom of flight": "Customers are searching for you right now. Let’s make sure they find you.",
+      "Book Now": "Click below to get started!"
     },
     "AircraftOptions": {
       "title": "Choose Your Aircraft",
@@ -102,5 +102,33 @@
       "details": "Details",
       "options": "Options",
       "billing_details": "Billing details"
-    }
+    },
+    "AboutBusiness": {
+      "title": "Why Your Business Needs More Than Just a Website—It Needs a Sales-Generating Machine",
+      "introParagraph1": "In today’s digital world, your website isn’t just an online brochure—it’s your business’s most powerful sales tool. Yet, too many business owners settle for generic, do-it-yourself website builders that leave them frustrated and stuck with a site that looks nice but doesn’t actually bring in customers.",
+      "introParagraph2": "If your website isn’t attracting visitors, building trust, and converting sales, it’s not just a bad website—it’s costing you money every single day.",
+      "harshRealityTitle": "The Harsh Reality: A Bad Website is Worse Than No Website",
+      "harshRealityText": "Think about the last time you searched for a business online. Did you land on a website that looked outdated, took forever to load, or made it hard to find what you needed? You left. That’s exactly what happens when potential customers encounter a poorly designed website.",
+      "harshRealityListItem1": "❌ Makes you look unprofessional – First impressions matter.",
+      "harshRealityListItem2": "❌ Loses customers to competitors – A slow or confusing site drives customers away.",
+      "harshRealityListItem3": "❌ Wastes your time & money – DIY builders often leave you with a site that doesn’t work properly.",
+      "harshRealityListItem4": "❌ Doesn’t show up on Google – Poor SEO means potential customers can’t find you.",
+      "harshRealityListItem5": "❌ Fails to convert visitors into paying customers – Your site should generate leads and sales.",
+      "benefitsTitle": "What a High-Performing Website Can Do for Your Business",
+      "benefitsIntro": "A high-performing website should be your hardest-working employee, working 24/7 to attract, convert, and retain customers.",
+      "benefitListItem1": "✅ Build trust & credibility – A sleek, modern site boosts your professional image.",
+      "benefitListItem2": "✅ Attract more customers – Expert SEO drives consistent traffic.",
+      "benefitListItem3": "✅ Convert visitors into customers – Clear, persuasive design guides actions.",
+      "benefitListItem4": "✅ Work on all devices – A mobile-friendly site reaches a wider audience.",
+      "benefitListItem5": "✅ Scale with your business – Custom solutions grow with your needs.",
+      "packageTitle": "What’s Included in Your Custom Website Package?",
+      "packageListItem1": "🔹 Stunning, Mobile-Friendly Design",
+      "packageListItem2": "🔹 SEO Optimization",
+      "packageListItem3": "🔹 High-Converting Copywriting",
+      "packageListItem4": "🔹 Lightning-Fast Speed",
+      "packageListItem5": "🔹 Easy-to-Use Contact & Booking Forms",
+      "finalCallTitle": "Ready to Take Your Business to the Next Level?",
+      "finalCallText": "A bad website is costing you sales every single day. Don't let another customer slip away. Invest in a high-converting website today and watch your business soar.",
+      "bookNow": "Book Now"
+    }   
   }

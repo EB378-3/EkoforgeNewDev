@@ -4,7 +4,7 @@ import React, { useState, useContext } from "react";
 import { useTranslations } from "next-intl";
 import NextImage from "next/image";
 import { RefineThemedLayoutV2HeaderProps } from "@refinedev/mui";
-import { ColorModeContext } from "@contexts/color-mode";
+import { ColorModeContext, useColorMode } from "@contexts/color-mode";
 import DarkModeOutlined from "@mui/icons-material/DarkModeOutlined";
 import LightModeOutlined from "@mui/icons-material/LightModeOutlined";
 
@@ -34,9 +34,9 @@ interface NavbarProps extends RefineThemedLayoutV2HeaderProps {
 const Navbar: React.FC<NavbarProps> = ({ locale }) => {
   const t = useTranslations("NavbarLinks");
   const theme = useTheme();
+  const { mode, setMode } = useColorMode();
   const isLargeScreen = useMediaQuery(theme.breakpoints.up("md"));
   const { push } = useNavigation();
-  const { mode, setMode } = useContext(ColorModeContext);
 
   const pathname = usePathname();
   const router = useRouter();
@@ -105,7 +105,7 @@ const Navbar: React.FC<NavbarProps> = ({ locale }) => {
                   padding: theme.spacing(0.5, 1),
                   transition: "transform 0.3s, background 0.3s",
                   "&:hover": {
-                    background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.light})`,
+                    background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.dark})`,
                     transform: "scale(1.05)",
                   },
                 }}
@@ -235,3 +235,4 @@ const Navbar: React.FC<NavbarProps> = ({ locale }) => {
 };
 
 export default Navbar;
+

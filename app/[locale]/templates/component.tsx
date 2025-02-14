@@ -2,15 +2,15 @@
 
 import React from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { useTheme } from "@mui/material/styles";
-import { useColorMode } from "@contexts/color-mode";
 import { Box, Typography, Button } from "@mui/material";
+import { getTheme } from "@theme/theme";
+import { useColorMode } from "@contexts/color-mode";
 
 const MyTemplateComponent: React.FC = () => {
   const t = useTranslations("Common");
   const locale = useLocale();
-  const theme = useTheme();
   const { mode, setMode } = useColorMode();
+  const theme = getTheme(mode);
 
   return (
     <Box sx={{ p: 2, backgroundColor: theme.palette.background.default }}>
