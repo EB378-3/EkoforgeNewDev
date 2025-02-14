@@ -54,7 +54,7 @@ type Testimonial = TextTestimonial | PhotoTestimonial | VideoTestimonial;
 const testimonials: Testimonial[] = [
   {
     id: 1,
-    name: "Alice Johnson",
+    name: "Emilia",
     feedback: "He communicated with everyone excellently and politely, on the other hand he was able to work very independently and had his own visions and ideas on how to do the work. He produced an amazing outreach video for our project.",
     rating: 5,
     type: "text",
@@ -77,7 +77,7 @@ const testimonials: Testimonial[] = [
   },
   {
     id: 4,
-    name: "Johnson Alice",
+    name: "Emilia",
     feedback: "He communicated with everyone excellently and politely, on the other hand he was able to work very independently and had his own visions and ideas on how to do the work. He produced an amazing outreach video for our project.",
     rating: 5,
     type: "text",
@@ -280,7 +280,7 @@ export default function Testimonials() {
             <TestimonialCarousel items={textTestimonials} TestimonialCardBG={theme.palette.secondary.main} />
           </Grid>
           <Grid item xs={12} md={4}>
-            <TestimonialCarousel items={videoTestimonials} TestimonialCardBG={theme.palette.primary.dark} />
+          <TestimonialCarousel items={photoTestimonials} TestimonialCardBG={theme.palette.primary.dark} />
           </Grid>
         </Grid>
       </Container>
