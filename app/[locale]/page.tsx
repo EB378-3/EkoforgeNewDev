@@ -157,27 +157,41 @@ export default function IndexPage() {
 
           {/* Call-to-Action Section */}
           <motion.div initial="hidden" whileInView="visible" variants={slideInRight}>
-            <Container sx={{ my: 6, textAlign: "center", px: { xs: 2, sm: 3, lg: 6 } }}>
-              <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1, fontSize: "1.25rem" }}>
+            <Container sx={{ my: 8, textAlign: "center", px: { xs: 2, sm: 3, lg: 6 } }}>
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: "bold",
+                  mb: 1,
+                  fontSize: { xs: "1.25rem", sm: "1.5rem", md: "2rem" },
+                }}
+              >
                 {t("Start Your Adventure Today")}
               </Typography>
-              <Typography variant="h6" sx={{ mb: 3, fontSize: "1rem" }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  mb: 3,
+                  fontSize: { xs: "0.75rem", sm: "1rem", md: "1.25rem" },
+                }}
+              >
                 {t("Discover the freedom of flight")}
               </Typography>
               <NextLink href={`/${locale}/book`} passHref>
-                <motion.div whileHover={{ scale: 1.05 }}>
+                <motion.div whileHover={{ scale: 1.15 }}>
                   <Button
                     variant="contained"
-                    size="small"
+                    size="medium"
                     sx={{
-                      px: 3,
-                      py: 1,
+                      px: 4,
+                      py: 2,
                       background: `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
                       color: theme.palette.common.white,
                       fontWeight: "bold",
                       borderRadius: 50,
                       boxShadow: 2,
                       textTransform: "none",
+                      fontSize: "1rem",
                     }}
                   >
                     {t("Book Now")}
@@ -186,6 +200,7 @@ export default function IndexPage() {
               </NextLink>
             </Container>
           </motion.div>
+
 
           {/* Testimonials Section */}
           <motion.div initial="hidden" whileInView="visible" variants={fadeInUp}>
