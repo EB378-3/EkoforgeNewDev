@@ -141,7 +141,7 @@ const Hero = () => {
           {/* Mobile CTA */}
           <Box
             sx={{
-              display: { xs: "flex", md: "none" },
+              display: { xs: "block", md: "none" },
               width: "100%",
               background: `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
               p: 2,
