@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { useLocale, useTranslations } from "next-intl";
 import { Box, Typography, Button } from "@mui/material";
+import { useLocale, useTranslations } from "next-intl";
 import { getTheme } from "@theme/theme";
 import { useColorMode } from "@contexts/color-mode";
 

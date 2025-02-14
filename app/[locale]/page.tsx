@@ -1,64 +1,63 @@
 "use client";
 
+import React, { Suspense } from "react";
 import Navbar from "@components/Front/Navbar";
 import Footer from "@components/Front/Footer";
-import React, { useState, Suspense } from "react";
-import { useLocale, useTranslations } from "next-intl";
-import NextLink from "next/link";
 import Hero from "@components/Front/Hero";
-import { motion } from "framer-motion";
 import Contact from "@components/Front/Contact";
 import Testimonials from "@components/Front/Testimonials";
+import { useLocale, useTranslations } from "next-intl";
+import NextLink from "next/link";
+import { motion } from "framer-motion";
+
+// MUI components
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import PlaneLightUp from "@components/Front/PlaneLightUp";
-import PlaneScrollIndicator from "@components/Front/PlaneLightUpopp";
 import { getTheme } from "@theme/theme";
 import { useColorMode } from "@contexts/color-mode";
 
 export default function IndexPage() {
-
   const t = useTranslations("HomePage");
-    const locale = useLocale();
-    const { mode, setMode } = useColorMode();
-    const theme = getTheme(mode);
-  
-    // Animation variants.
-    const fadeInUp = {
-      hidden: { opacity: 0, y: 50 },
-      visible: { opacity: 1, y: 0, transition: { duration: 1 } },
-    };
-  
-    const slideInRight = {
-      hidden: { opacity: 0, x: 100 },
-      visible: { opacity: 1, x: 0, transition: { duration: 1 } },
-    };
-  
-    // Data for the information cards.
-    const cardsData = [
-      {
-        title: t("Flexible Booking"),
-        detail: t("Choose rental times that fit your schedule"),
-        gradient: `linear-gradient(to top, ${theme.palette.primary.dark}, ${theme.palette.primary.light})`,
-      },
-      {
-        title: t("Cost-Effective Pricing"),
-        detail: `${t("twoOne")}\n${t("twoTwo")}\n${t("twoThree")}\n${t("twoFour")}`,
-        gradient: `linear-gradient(to top, ${theme.palette.primary.dark}, ${theme.palette.primary.light})`,
-      },
-      {
-        title: t("Beautiful Destinations"),
-        detail: t("Fly to stunning locations around Southern Finland"),
-        gradient: `linear-gradient(to top, ${theme.palette.primary.dark}, ${theme.palette.primary.light})`,
-      },
-    ];
+  const locale = useLocale();
+  const { mode } = useColorMode();
+  const theme = getTheme(mode);
+
+  // Animation variants.
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0, transition: { duration: 1 } },
+  };
+
+  const slideInRight = {
+    hidden: { opacity: 0, x: 100 },
+    visible: { opacity: 1, x: 0, transition: { duration: 1 } },
+  };
+
+  // Data for the information cards.
+  const cardsData = [
+    {
+      title: t("Flexible Booking"),
+      detail: t("Choose rental times that fit your schedule"),
+      gradient: `linear-gradient(to top, ${theme.palette.primary.dark}, ${theme.palette.primary.light})`,
+    },
+    {
+      title: t("Cost-Effective Pricing"),
+      detail: `${t("twoOne")}\n${t("twoTwo")}\n${t("twoThree")}\n${t("twoFour")}`,
+      gradient: `linear-gradient(to top, ${theme.palette.primary.dark}, ${theme.palette.primary.light})`,
+    },
+    {
+      title: t("Beautiful Destinations"),
+      detail: t("Fly to stunning locations around Southern Finland"),
+      gradient: `linear-gradient(to top, ${theme.palette.primary.dark}, ${theme.palette.primary.light})`,
+    },
+  ];
 
   return (
-    <Suspense>
-      <Navbar/>
+    <Suspense fallback={<div>Loading...</div>}>
+      <Navbar />
       <Box
         sx={{
           display: "flex",
@@ -100,12 +99,11 @@ export default function IndexPage() {
                     px: 2,
                     color: "#fff",
                     borderRadius: 2,
-                    ml: 2,
                     boxShadow: "0 2px 4px rgba(255,255,255,0.5)",
                     textShadow: "0 2px 4px rgba(0,0,0,0.5)",
                   }}
                 >
-                {t("loosing clients")}
+                  {t("loosing clients")}
                 </Box>
               </Typography>
             </motion.div>
@@ -189,16 +187,10 @@ export default function IndexPage() {
             </Container>
           </motion.div>
 
-          {/* Plane Light Up Component */}
-          <PlaneLightUp />
-
           {/* Testimonials Section */}
           <motion.div initial="hidden" whileInView="visible" variants={fadeInUp}>
             <Testimonials />
           </motion.div>
-
-          {/* Plane Light Up Component */}
-          <PlaneScrollIndicator />
 
           {/* Contact Section */}
           <motion.div
@@ -211,7 +203,7 @@ export default function IndexPage() {
           </motion.div>
         </Box>
       </Box>
-      <Footer/>
+      <Footer />
     </Suspense>
   );
 }

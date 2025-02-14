@@ -2,49 +2,49 @@
 import { createTheme } from "@mui/material/styles";
 import { RefineThemes } from "@refinedev/mui";
 
-// Define the light theme using RefineThemes.Orange.
+// Light theme using RefineThemes.Orange.
 export const lightTheme = createTheme(RefineThemes.Orange, {
   palette: {
     primary: {
       main: "#C15925", // Orange main
       light: "#CD7A51", // Orange light
-      dark: "#A83800", // Orange dark
+      dark: "#A83800",  // Orange dark
       contrastText: "#ffffff",
     },
     secondary: {
-      main: "#999999", // Grey main
-      light: "#CCCCCC", // Grey light
-      dark: "#737373", // Grey dark
+      main: "#005b96", // A deep blue for light mode
+      light: "#337ab7",
+      dark: "#003f6e",
       contrastText: "#000000",
     },
     error: {
       main: "#f44336",
       light: "#e57373",
       dark: "#d32f2f",
-      contrastText: "#fff",
+      contrastText: "#ffffff",
     },
     warning: {
       main: "#ffa726",
       light: "#ffb74d",
       dark: "#f57c00",
-      contrastText: "#fff",
+      contrastText: "#cc7e0a",
     },
     info: {
       main: "#29b6f6",
       light: "#4fc3f7",
       dark: "#0288d1",
-      contrastText: "#fff",
+      contrastText: "#666666",
     },
     success: {
       main: "#66bb6a",
       light: "#81c784",
       dark: "#388e3c",
-      contrastText: "#fff",
+      contrastText: "#000000",
     },
   },
 });
 
-// Define the dark theme using RefineThemes.OrangeDark.
+// Dark theme using RefineThemes.OrangeDark.
 export const darkTheme = createTheme(RefineThemes.OrangeDark, {
   palette: {
     primary: {
@@ -54,34 +54,34 @@ export const darkTheme = createTheme(RefineThemes.OrangeDark, {
       contrastText: "#ffffff",
     },
     secondary: {
-      main: "#999999",
-      light: "#CCCCCC",
-      dark: "#737373",
+      main: "#66b2ff", // A brighter blue tailored for dark mode
+      light: "#99ccff",
+      dark: "#3385ff",
       contrastText: "#000000",
     },
     error: {
       main: "#f44336",
       light: "#e57373",
       dark: "#d32f2f",
-      contrastText: "#fff",
+      contrastText: "#ffffff",
     },
     warning: {
       main: "#ffa726",
       light: "#ffb74d",
       dark: "#f57c00",
-      contrastText: "#fff",
+      contrastText: "#ffa726",
     },
     info: {
-      main: "#29b6f6",
-      light: "#4fc3f7",
+      main: "#4fc3f7", // A slightly lighter info color for better visibility on dark backgrounds
+      light: "#80dfff",
       dark: "#0288d1",
-      contrastText: "#fff",
+      contrastText: "#aaaaaa",
     },
     success: {
       main: "#66bb6a",
       light: "#81c784",
       dark: "#388e3c",
-      contrastText: "#fff",
+      contrastText: "#ffffff",
     },
   },
 });

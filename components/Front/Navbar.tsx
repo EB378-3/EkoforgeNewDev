@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { useTranslations } from "next-intl";
 import NextImage from "next/image";
 import { RefineThemedLayoutV2HeaderProps } from "@refinedev/mui";
-import { ColorModeContext, useColorMode } from "@contexts/color-mode";
+import { useColorMode } from "@contexts/color-mode";
 import DarkModeOutlined from "@mui/icons-material/DarkModeOutlined";
 import LightModeOutlined from "@mui/icons-material/LightModeOutlined";
 
@@ -16,7 +16,7 @@ import Button from "@mui/material/Button";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useTheme } from "@mui/material/styles";
+import { getTheme } from "@theme/theme";
 
 // MUI icons
 import MenuIcon from "@mui/icons-material/Menu";
@@ -33,8 +33,8 @@ interface NavbarProps extends RefineThemedLayoutV2HeaderProps {
 
 const Navbar: React.FC<NavbarProps> = ({ locale }) => {
   const t = useTranslations("NavbarLinks");
-  const theme = useTheme();
   const { mode, setMode } = useColorMode();
+  const theme = getTheme(mode);
   const isLargeScreen = useMediaQuery(theme.breakpoints.up("md"));
   const { push } = useNavigation();
 
@@ -53,10 +53,10 @@ const Navbar: React.FC<NavbarProps> = ({ locale }) => {
 
   // Navigation links for desktop and mobile menus
   const navLinks = [
-    { label: t("recource-selction"), href: `/${currentLocale}/#recource-selction` },
-    { label: t("contact"), href: `/${currentLocale}/#contact` },
-    { label: t("bookDiscoveryFlight"), href: `/${currentLocale}/web` },
-    { label: t("members"), href: `/${currentLocale}/book` },
+    { label: t("navLink1"), href: `/${currentLocale}/#testimonials` },
+    { label: t("navLink2"), href: `/${currentLocale}/#contact` },
+    { label: t("navLink3"), href: `/${currentLocale}/web` },
+    { label: t("navLink4"), href: `https://calendly.com/ekoforge` },
   ];
 
   return (
@@ -64,8 +64,9 @@ const Navbar: React.FC<NavbarProps> = ({ locale }) => {
       component="nav"
       sx={{
         width: "100%",
-        background: `linear-gradient(360deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
+        background: `linear-gradient(180deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
         color: theme.palette.primary.contrastText,
+        boxShadow: "0px 2px 4px rgba(0,0,0,0.1)",
       }}
     >
       <Toolbar
@@ -73,40 +74,39 @@ const Navbar: React.FC<NavbarProps> = ({ locale }) => {
           justifyContent: "space-between",
           maxWidth: 1200,
           mx: "auto",
-          px: 1,
-          py: 0.5,
+          px: 2,
+          py: 1,
         }}
       >
-        {/* Logo: Clickable area that navigates to home */}
+        {/* Logo */}
         <Box
           sx={{ cursor: "pointer", display: "flex", alignItems: "center" }}
           onClick={() => push(`/${currentLocale}/`)}
         >
           <NextImage
             src="/Logo.png" // Replace with your logo path
-            width={50}
-            height={17} // Adjust height to maintain proportions
+            width={200}
+            height={40} // Adjust height to maintain proportions
             alt="Southern Finland Aircraft Rentals"
           />
         </Box>
 
-        {/* Desktop: Navigation links, dark mode toggle, and language selector */}
+        {/* Desktop Menu */}
         {isLargeScreen ? (
-          <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
+          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
             {navLinks.map((link) => (
               <Button
                 key={link.href}
                 onClick={() => push(link.href)}
                 sx={{
-                  fontWeight: "bold",
+                  fontWeight: 500,
                   textTransform: "none",
-                  fontSize: "0.875rem",
+                  fontSize: "0.9rem",
                   color: theme.palette.primary.contrastText,
-                  padding: theme.spacing(0.5, 1),
-                  transition: "transform 0.3s, background 0.3s",
+                  transition: "background-color 0.3s, color 0.3s",
                   "&:hover": {
-                    background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.dark})`,
-                    transform: "scale(1.05)",
+                    backgroundColor: theme.palette.action.hover,
+                    color: theme.palette.secondary.main,
                   },
                 }}
               >
@@ -117,25 +117,33 @@ const Navbar: React.FC<NavbarProps> = ({ locale }) => {
               color="inherit"
               onClick={() => setMode()}
               sx={{
-                ml: 0.5,
-                p: 0.5,
+                ml: 1,
+                p: 1,
                 border: `1px solid ${theme.palette.primary.contrastText}`,
+                borderRadius: 1,
               }}
             >
-              {mode === "dark" ? <LightModeOutlined fontSize="small" /> : <DarkModeOutlined fontSize="small" />}
+              {mode === "dark" ? (
+                <LightModeOutlined fontSize="small" />
+              ) : (
+                <DarkModeOutlined fontSize="small" />
+              )}
             </IconButton>
             <Select
               value={currentLocale}
               onChange={handleLanguageChange}
               sx={{
                 borderRadius: 1,
-                fontSize: "0.875rem",
-                px: 0.75,
-                py: 0.25,
+                fontSize: "0.9rem",
+                px: 1,
+                py: 0.5,
                 backgroundColor: theme.palette.primary.main,
                 color: theme.palette.primary.contrastText,
                 border: `1px solid ${theme.palette.secondary.main}`,
-                ".MuiSelect-icon": { color: theme.palette.primary.contrastText, fontSize: "1rem" },
+                ".MuiSelect-icon": {
+                  color: theme.palette.primary.contrastText,
+                  fontSize: "1rem",
+                },
                 "&:hover": {
                   borderColor: theme.palette.secondary.light,
                 },
@@ -146,25 +154,34 @@ const Navbar: React.FC<NavbarProps> = ({ locale }) => {
             </Select>
           </Box>
         ) : (
-          // Mobile: Dark mode toggle and menu toggle
+          // Mobile Menu Toggle
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <IconButton
               color="inherit"
               onClick={() => setMode()}
               sx={{
-                p: 0.5,
+                p: 1,
                 border: `1px solid ${theme.palette.primary.contrastText}`,
+                borderRadius: 1,
               }}
             >
-              {mode === "dark" ? <LightModeOutlined fontSize="small" /> : <DarkModeOutlined fontSize="small" />}
+              {mode === "dark" ? (
+                <LightModeOutlined fontSize="small" />
+              ) : (
+                <DarkModeOutlined fontSize="small" />
+              )}
             </IconButton>
             <IconButton
               edge="end"
               color="inherit"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              sx={{ p: 0.5 }}
+              sx={{ p: 1 }}
             >
-              {isMobileMenuOpen ? <CloseIcon fontSize="small" /> : <MenuIcon fontSize="small" />}
+              {isMobileMenuOpen ? (
+                <CloseIcon fontSize="small" />
+              ) : (
+                <MenuIcon fontSize="small" />
+              )}
             </IconButton>
           </Box>
         )}
@@ -178,8 +195,8 @@ const Navbar: React.FC<NavbarProps> = ({ locale }) => {
             flexDirection: "column",
             background: theme.palette.primary.dark,
             color: theme.palette.primary.contrastText,
-            px: 1,
-            py: 1,
+            px: 2,
+            py: 2,
             gap: 1,
           }}
         >
@@ -192,15 +209,14 @@ const Navbar: React.FC<NavbarProps> = ({ locale }) => {
                 setIsMobileMenuOpen(false);
               }}
               sx={{
-                fontWeight: "bold",
+                fontWeight: 500,
                 textTransform: "none",
-                fontSize: "0.875rem",
+                fontSize: "0.9rem",
                 color: theme.palette.common.white,
-                padding: theme.spacing(0.5, 1),
-                transition: "transform 0.3s, background 0.3s",
+                transition: "background-color 0.3s, color 0.3s",
                 "&:hover": {
-                  background: `linear-gradient(45deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.light})`,
-                  transform: "scale(1.05)",
+                  backgroundColor: theme.palette.action.hover,
+                  color: theme.palette.secondary.main,
                 },
               }}
             >
@@ -213,13 +229,16 @@ const Navbar: React.FC<NavbarProps> = ({ locale }) => {
             fullWidth
             sx={{
               borderRadius: 1,
-              fontSize: "0.875rem",
-              px: 0.75,
-              py: 0.25,
+              fontSize: "0.9rem",
+              px: 1,
+              py: 0.5,
               backgroundColor: theme.palette.primary.main,
               color: theme.palette.primary.contrastText,
               border: `1px solid ${theme.palette.secondary.main}`,
-              ".MuiSelect-icon": { color: theme.palette.primary.contrastText, fontSize: "1rem" },
+              ".MuiSelect-icon": {
+                color: theme.palette.primary.contrastText,
+                fontSize: "1rem",
+              },
               "&:hover": {
                 borderColor: theme.palette.secondary.light,
               },
@@ -235,4 +254,3 @@ const Navbar: React.FC<NavbarProps> = ({ locale }) => {
 };
 
 export default Navbar;
-

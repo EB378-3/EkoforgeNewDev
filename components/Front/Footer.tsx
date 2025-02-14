@@ -13,7 +13,6 @@ import Typography from "@mui/material/Typography";
 import Link from "@mui/material/Link";
 import { useTheme } from "@mui/material/styles";
 import { IconButton } from "@node_modules/@mui/material";
-import { RefineThemedLayoutV2HeaderProps } from "@refinedev/mui";
 import { ColorModeContext } from "@contexts/color-mode";
 import DarkModeOutlined from "@mui/icons-material/DarkModeOutlined";
 import LightModeOutlined from "@mui/icons-material/LightModeOutlined";
@@ -29,15 +28,15 @@ const Footer = () => {
     <Box
       component="footer"
       sx={{
-        backgroundColor: theme.palette.primary.dark,
+        backgroundColor: theme.palette.background.default,
         color: theme.palette.common.white,
         width: "100%",
       }}
     >
       {/* Divider */}
-      <Box sx={{ borderBottom: `1px solid ${theme.palette.grey[700]}`, mb: 3 }} />
+      <Box sx={{ borderBottom: `1px solid ${theme.palette.grey[700]}`}} />
 
-      <Container sx={{ py: 10, px: { xs: 2, lg: 3 } }}>
+      <Container sx={{ py: 5, px: { xs: 2, lg: 3 } }}>
         <Grid container spacing={4} textAlign={{ xs: "center", md: "left" }}>
           {/* About Section */}
           <Grid item xs={12} md={4}>
@@ -46,51 +45,41 @@ const Footer = () => {
                 <NextImage
                   src="/Logo.png" // Replace with your aircraft rental logo
                   alt="Logo"
-                  width={220}
-                  height={80}
-                  style={{ display: "block", margin: "0 auto" }}
+                  width={250}
+                  height={50}
+                  style={{ display: "block", }}
                 />
               </Link>
             </Box>
-            <Typography variant="body2" sx={{ color: theme.palette.grey[300] }}>
+            <Typography variant="body2" sx={{ color: theme.palette.info.contrastText }}>
               {t("aboutText")}
             </Typography>
           </Grid>
 
           {/* Navigation Section */}
           <Grid item xs={12} md={2}>
-            <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2, color: theme.palette.success.contrastText }}>
               {t("navigation")}
             </Typography>
             <Box component="ul" sx={{ listStyle: "none", p: 0, m: 0 }}>
               <Box component="li" sx={{ mb: 1 }}>
                 <Link
                   component={NextLink}
-                  href={`/${locale}/book`}
+                  href={`https://calendly.com/ekoforge`}
                   underline="hover"
-                  sx={{ color: theme.palette.grey[300] }}
+                  sx={{ color: theme.palette.info.contrastText }}
                 >
-                  {t("book a flight")}
+                  {t("navLink1")}
                 </Link>
               </Box>
               <Box component="li" sx={{ mb: 1 }}>
                 <Link
                   component={NextLink}
-                  href={`/${locale}/#recource-selction`}
+                  href={`/${locale}/#testimonials`}
                   underline="hover"
-                  sx={{ color: theme.palette.grey[300] }}
+                  sx={{ color: theme.palette.info.contrastText }}
                 >
-                  {t("testimonials")}
-                </Link>
-              </Box>
-              <Box component="li" sx={{ mb: 1 }}>
-                <Link
-                  component={NextLink}
-                  href={`/${locale}/web`}
-                  underline="hover"
-                  sx={{ color: theme.palette.grey[300] }}
-                >
-                  {t("webexamples")}
+                  {t("navLink2")}
                 </Link>
               </Box>
               <Box component="li" sx={{ mb: 1 }}>
@@ -98,9 +87,19 @@ const Footer = () => {
                   component={NextLink}
                   href={`/${locale}/#contact`}
                   underline="hover"
-                  sx={{ color: theme.palette.grey[300] }}
+                  sx={{ color: theme.palette.info.contrastText }}
                 >
-                  {t("contact")}
+                  {t("navLink3")}
+                </Link>
+              </Box>
+              <Box component="li" sx={{ mb: 1 }}>
+                <Link
+                  component={NextLink}
+                  href={`/${locale}/web`}
+                  underline="hover"
+                  sx={{ color: theme.palette.info.contrastText }}
+                >
+                  {t("navLink4")}
                 </Link>
               </Box>
             </Box>
@@ -108,7 +107,7 @@ const Footer = () => {
 
           {/* Social Media Section */}
           <Grid item xs={12} md={2}>
-            <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2, color: theme.palette.success.contrastText }}>
               {t("socialmedia")}
             </Typography>
             <Box component="ul" sx={{ listStyle: "none", p: 0, m: 0 }}>
@@ -117,7 +116,7 @@ const Footer = () => {
                   component={NextLink}
                   href="https://www.instagram.com/eko._forge/"
                   underline="hover"
-                  sx={{ color: theme.palette.grey[300] }}
+                  sx={{ color: theme.palette.info.contrastText }}
                 >
                   {t("instagram")}
                 </Link>
@@ -127,7 +126,7 @@ const Footer = () => {
                   component={NextLink}
                   href="https://www.facebook.com/eko._forge"
                   underline="hover"
-                  sx={{ color: theme.palette.grey[300] }}
+                  sx={{ color: theme.palette.info.contrastText }}
                 >
                   {t("facebook")}
                 </Link>
@@ -137,7 +136,7 @@ const Footer = () => {
                   component={NextLink}
                   href="https://www.linkedin.com/company/ekoforge"
                   underline="hover"
-                  sx={{ color: theme.palette.grey[300] }}
+                  sx={{ color: theme.palette.info.contrastText }}
                 >
                   {t("linkedin")}
                 </Link>
@@ -147,7 +146,7 @@ const Footer = () => {
 
           {/* Company Section */}
           <Grid item xs={12} md={2}>
-            <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2, color: theme.palette.success.contrastText }}>
               {t("company")}
             </Typography>
             <Box component="ul" sx={{ listStyle: "none", p: 0, m: 0 }}>
@@ -156,7 +155,7 @@ const Footer = () => {
                   component={NextLink}
                   href={`/${locale}/about`}
                   underline="hover"
-                  sx={{ color: theme.palette.grey[300] }}
+                  sx={{ color: theme.palette.info.contrastText }}
                 >
                   {t("about")}
                 </Link>
@@ -166,7 +165,7 @@ const Footer = () => {
                   component={NextLink}
                   href={`/${locale}/profile`}
                   underline="hover"
-                  sx={{ color: theme.palette.grey[300] }}
+                  sx={{ color: theme.palette.info.contrastText }}
                 >
                   {t("login")}
                 </Link>
@@ -176,7 +175,7 @@ const Footer = () => {
 
           {/* Legal Section */}
           <Grid item xs={12} md={2}>
-            <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2, color: theme.palette.success.contrastText }}>
               {t("legal")}
             </Typography>
             <Box component="ul" sx={{ listStyle: "none", p: 0, m: 0 }}>
@@ -185,7 +184,7 @@ const Footer = () => {
                   component={NextLink}
                   href={`/${locale}/terms`}
                   underline="hover"
-                  sx={{ color: theme.palette.grey[300] }}
+                  sx={{ color: theme.palette.info.contrastText }}
                 >
                   {t("terms")}
                 </Link>
@@ -195,7 +194,7 @@ const Footer = () => {
                   component={NextLink}
                   href={`/${locale}/privacy`}
                   underline="hover"
-                  sx={{ color: theme.palette.grey[300] }}
+                  sx={{ color: theme.palette.info.contrastText }}
                 >
                   {t("privacy")}
                 </Link>
@@ -205,7 +204,7 @@ const Footer = () => {
                   component={NextLink}
                   href={`/${locale}/license`}
                   underline="hover"
-                  sx={{ color: theme.palette.grey[300] }}
+                  sx={{ color: theme.palette.info.contrastText }}
                 >
                   {t("license")}
                 </Link>
@@ -217,12 +216,12 @@ const Footer = () => {
         {/* Footer Bottom */}
         <Box
           sx={{
-            mt: 8,
+            mt: 4,
             borderTop: `1px solid ${theme.palette.grey[700]}`,
             pt: 3,
             textAlign: "center",
             fontSize: "0.875rem",
-            color: theme.palette.grey[300],
+            color: theme.palette.info.contrastText,
           }}
         >
           © {currentYear} Wing Aviators {t("rights")}

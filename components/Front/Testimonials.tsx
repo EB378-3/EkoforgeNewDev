@@ -10,15 +10,18 @@ import {
   CardMedia,
   IconButton,
   Rating,
-  Button,
+  Grid,
 } from "@mui/material";
 import {
   ChevronLeft,
   ChevronRight,
   Star as StarIcon,
+  FormatQuote,
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { getTheme } from "@theme/theme";
+import { useColorMode } from "@contexts/color-mode";
 
 // --- Types for Testimonials ---
 type TestimonialType = "text" | "photo" | "video";
@@ -99,16 +102,20 @@ const testimonials: Testimonial[] = [
 
 // --- Animation Variants ---
 const slideVariants = {
-  hidden: { opacity: 0, x: -50 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.5 } },
+  hidden: { opacity: 0, x: -30, scale: 0.95 },
+  visible: { opacity: 1, x: 0, scale: 1, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
 interface CarouselProps {
   items: Testimonial[];
+  TestimonialCardBG: string;
 }
 
-const TestimonialCarousel: React.FC<CarouselProps> = ({ items }) => {
+const TestimonialCarousel: React.FC<CarouselProps> = ({ items, TestimonialCardBG }) => {
   const t = useTranslations("Testimonials");
+  const locale = useLocale();
+  const { mode } = useColorMode();
+  const theme = getTheme(mode);
   const [current, setCurrent] = useState(0);
 
   const nextSlide = () => setCurrent((prev) => (prev + 1) % items.length);
@@ -122,13 +129,23 @@ const TestimonialCarousel: React.FC<CarouselProps> = ({ items }) => {
     <Box sx={{ mb: 8 }}>
       <Container maxWidth="sm" sx={{ position: "relative" }}>
         <motion.div variants={slideVariants} initial="hidden" animate="visible">
-          <Card sx={{ bgcolor: "grey.800", p: 2, textAlign: "center" }}>
+          <Card
+            sx={{
+              bgcolor: TestimonialCardBG,
+              p: 3,
+              borderRadius: 3,
+              boxShadow: 6,
+              textAlign: "center",
+              position: "relative",
+            }}
+          >
             {currentTestimonial.type === "text" && (
               <CardContent>
-                <Typography variant="body1" fontStyle="italic">
+                <FormatQuote sx={{ fontSize: 40, color: "grey.300", mb: 2 }} />
+                <Typography variant="body1" fontStyle="italic" sx={{ mb: 2 }}>
                   {currentTestimonial.feedback}
                 </Typography>
-                <Typography variant="subtitle1" fontWeight="bold" mt={2}>
+                <Typography variant="subtitle1" fontWeight="bold">
                   {currentTestimonial.name}
                 </Typography>
               </CardContent>
@@ -140,20 +157,19 @@ const TestimonialCarousel: React.FC<CarouselProps> = ({ items }) => {
                   image={(currentTestimonial as PhotoTestimonial).imageUrl}
                   alt={(currentTestimonial as PhotoTestimonial).name}
                   sx={{
-                    width: 100,
-                    height: 100,
+                    width: 120,
+                    height: 120,
                     borderRadius: "50%",
-                    border: "4px solid",
-                    borderColor: "warning.main",
+                    border: `4px solid ${theme.palette.warning.main}`,
                     mx: "auto",
                     mb: 2,
                   }}
                 />
                 <CardContent>
-                  <Typography variant="body1" fontStyle="italic">
+                  <Typography variant="body1" fontStyle="italic" sx={{ mb: 2 }}>
                     {currentTestimonial.feedback}
                   </Typography>
-                  <Typography variant="subtitle1" fontWeight="bold" mt={2}>
+                  <Typography variant="subtitle1" fontWeight="bold">
                     {currentTestimonial.name}
                   </Typography>
                 </CardContent>
@@ -165,8 +181,10 @@ const TestimonialCarousel: React.FC<CarouselProps> = ({ items }) => {
                   sx={{
                     position: "relative",
                     width: "100%",
-                    paddingTop: "56.25%", // 16:9 aspect ratio
+                    paddingTop: "56.25%",
                     mb: 2,
+                    borderRadius: 2,
+                    overflow: "hidden",
                   }}
                 >
                   <iframe
@@ -184,35 +202,48 @@ const TestimonialCarousel: React.FC<CarouselProps> = ({ items }) => {
                   />
                 </Box>
                 <CardContent>
-                  <Typography variant="body1" fontStyle="italic">
-                    {currentTestimonial.feedback}
-                  </Typography>
-                  <Typography variant="subtitle1" fontWeight="bold" mt={2}>
+                  <Typography variant="subtitle1" fontWeight="bold">
                     {currentTestimonial.name}
                   </Typography>
                 </CardContent>
               </>
             )}
-            <Box mt={1}>
+            <Box mt={2}>
               <Rating
                 name={`rating-${currentTestimonial.id}`}
                 value={currentTestimonial.rating}
                 precision={0.5}
                 readOnly
-                icon={<StarIcon fontSize="inherit" />}
+                icon={<StarIcon fontSize="inherit" sx={{ color: theme.palette.warning.main }} />}
                 emptyIcon={<StarIcon fontSize="inherit" sx={{ opacity: 0.3 }} />}
               />
             </Box>
+            <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
+              <IconButton
+                onClick={prevSlide}
+                sx={{
+                  backgroundColor: "rgba(255, 255, 255, 0.2)",
+                  "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.3)" },
+                  color: "common.white",
+                }}
+                aria-label="Previous Slide"
+              >
+                <ChevronLeft />
+              </IconButton>
+              <IconButton
+                onClick={nextSlide}
+                sx={{
+                  backgroundColor: "rgba(255, 255, 255, 0.2)",
+                  "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.3)" },
+                  color: "common.white",
+                }}
+                aria-label="Next Slide"
+              >
+                <ChevronRight />
+              </IconButton>
+            </Box>
           </Card>
         </motion.div>
-        <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
-          <IconButton onClick={prevSlide} sx={{ color: "common.white" }} aria-label="Previous Slide">
-            <ChevronLeft />
-          </IconButton>
-          <IconButton onClick={nextSlide} sx={{ color: "common.white" }} aria-label="Next Slide">
-            <ChevronRight />
-          </IconButton>
-        </Box>
       </Container>
     </Box>
   );
@@ -220,6 +251,9 @@ const TestimonialCarousel: React.FC<CarouselProps> = ({ items }) => {
 
 export default function Testimonials() {
   const t = useTranslations("Testimonials");
+  const locale = useLocale();
+  const { mode } = useColorMode();
+  const theme = getTheme(mode);
 
   // Split testimonials by type.
   const textTestimonials = testimonials.filter((item) => item.type === "text");
@@ -227,13 +261,29 @@ export default function Testimonials() {
   const videoTestimonials = testimonials.filter((item) => item.type === "video");
 
   return (
-    <Box component="section" sx={{ py: 8, color: "common.white" }}>
-      <Typography variant="h4" textAlign="center" mb={4} fontWeight="bold">
-        {t("title")}
-      </Typography>
-      <TestimonialCarousel items={textTestimonials} />
-      <TestimonialCarousel items={photoTestimonials} />
-      <TestimonialCarousel items={videoTestimonials} />
+    <Box component="section" id="testimonials" sx={{ py: 10, backgroundColor: theme.palette.background.default }}>
+      <Container maxWidth="lg">
+        <Typography
+          variant="h4"
+          textAlign="center"
+          mb={6}
+          fontWeight="bold"
+          sx={{ color: theme.palette.text.primary }}
+        >
+          {t("title")}
+        </Typography>
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={4}>
+            <TestimonialCarousel items={photoTestimonials} TestimonialCardBG={theme.palette.primary.dark} />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TestimonialCarousel items={textTestimonials} TestimonialCardBG={theme.palette.secondary.main} />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TestimonialCarousel items={videoTestimonials} TestimonialCardBG={theme.palette.primary.dark} />
+          </Grid>
+        </Grid>
+      </Container>
     </Box>
   );
 }

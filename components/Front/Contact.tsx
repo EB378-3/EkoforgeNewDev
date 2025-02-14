@@ -17,7 +17,7 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
 import BusinessIcon from "@mui/icons-material/Business";
 
-// Create motion-enabled components
+// Motion-enabled components
 const MotionBox = motion(Box);
 const MotionTypography = motion(Typography);
 
@@ -46,8 +46,12 @@ const Contact = () => {
       });
 
       const result = await response.json();
-      if (result.success) alert("Thank you for your submission!");
-      else alert("Submission failed. Please try again.");
+      if (result.success) {
+        alert("Thank you for your submission!");
+        form.reset();
+      } else {
+        alert("Submission failed. Please try again.");
+      }
     } catch (error) {
       alert("An error occurred. Please try again.");
       console.error("Error submitting form:", error);
@@ -59,8 +63,8 @@ const Contact = () => {
       id="contact"
       sx={{
         position: "relative",
-        py: 12, // reduced vertical padding
-        px: 4,  // reduced horizontal padding
+        py: 12,
+        px: 4,
         background: `linear-gradient(to bottom, ${theme.palette.background.default}, ${theme.palette.primary.dark})`,
         color: theme.palette.text.primary,
       }}
@@ -118,19 +122,13 @@ const Contact = () => {
                     required
                     sx={{
                       "& .MuiOutlinedInput-root": {
-                        "& fieldset": {
-                          borderColor: theme.palette.grey[700],
-                        },
-                        "&:hover fieldset": {
-                          borderColor: theme.palette.primary.dark,
-                        },
-                        "&.Mui-focused fieldset": {
-                          borderColor: theme.palette.primary.main,
-                        },
-                        color: theme.palette.text.primary,
+                        "& fieldset": { borderColor: theme.palette.grey[700] },
+                        "&:hover fieldset": { borderColor: theme.palette.primary.dark },
+                        "&.Mui-focused fieldset": { borderColor: theme.palette.primary.main },
+                        color: theme.palette.secondary.contrastText,
                       },
                       "& .MuiInputLabel-root": {
-                        color: theme.palette.text.primary,
+                        color: theme.palette.secondary.contrastText,
                         fontSize: "0.875rem",
                       },
                       fontSize: "0.875rem",
@@ -151,19 +149,13 @@ const Contact = () => {
                     required
                     sx={{
                       "& .MuiOutlinedInput-root": {
-                        "& fieldset": {
-                          borderColor: theme.palette.grey[700],
-                        },
-                        "&:hover fieldset": {
-                          borderColor: theme.palette.primary.dark,
-                        },
-                        "&.Mui-focused fieldset": {
-                          borderColor: theme.palette.primary.main,
-                        },
-                        color: theme.palette.text.primary,
+                        "& fieldset": { borderColor: theme.palette.grey[700] },
+                        "&:hover fieldset": { borderColor: theme.palette.primary.dark },
+                        "&.Mui-focused fieldset": { borderColor: theme.palette.primary.main },
+                        color: theme.palette.secondary.contrastText,
                       },
                       "& .MuiInputLabel-root": {
-                        color: theme.palette.text.primary,
+                        color: theme.palette.secondary.contrastText,
                         fontSize: "0.875rem",
                       },
                       fontSize: "0.875rem",
@@ -185,19 +177,13 @@ const Contact = () => {
                     rows={4}
                     sx={{
                       "& .MuiOutlinedInput-root": {
-                        "& fieldset": {
-                          borderColor: theme.palette.grey[700],
-                        },
-                        "&:hover fieldset": {
-                          borderColor: theme.palette.primary.dark,
-                        },
-                        "&.Mui-focused fieldset": {
-                          borderColor: theme.palette.primary.main,
-                        },
-                        color: theme.palette.text.primary,
+                        "& fieldset": { borderColor: theme.palette.grey[700] },
+                        "&:hover fieldset": { borderColor: theme.palette.primary.dark },
+                        "&.Mui-focused fieldset": { borderColor: theme.palette.primary.main },
+                        color: theme.palette.secondary.contrastText,
                       },
                       "& .MuiInputLabel-root": {
-                        color: theme.palette.text.primary,
+                        color: theme.palette.secondary.contrastText,
                         fontSize: "0.875rem",
                       },
                       fontSize: "0.875rem",
@@ -250,7 +236,11 @@ const Contact = () => {
             >
               <Typography
                 variant="h6"
-                sx={{ fontWeight: "bold", color: theme.palette.warning.main, fontSize: "1rem" }}
+                sx={{
+                  fontWeight: "bold",
+                  color: theme.palette.warning.contrastText,
+                  fontSize: "1rem",
+                }}
               >
                 {t("contact information")}
               </Typography>
@@ -277,7 +267,7 @@ const Contact = () => {
                       "&:hover": { color: theme.palette.warning.light },
                     }}
                   >
-                    +358 44 2413 840
+                    +358 44 241 3840
                   </Link>
                 </Box>
                 <Box
@@ -290,7 +280,7 @@ const Contact = () => {
                 >
                   <EmailIcon sx={{ color: theme.palette.warning.main, fontSize: 24 }} />
                   <Link
-                    href="mailto:ekoforge@gmail.com"
+                    href="mailto:Air.rentals@gmail.com"
                     underline="none"
                     sx={{
                       fontSize: "0.875rem",
@@ -298,7 +288,7 @@ const Contact = () => {
                       "&:hover": { color: theme.palette.warning.light },
                     }}
                   >
-                    Air.rentals@gmail.com
+                    ekoforge@gmail.com
                   </Link>
                 </Box>
                 <Box
@@ -310,8 +300,11 @@ const Contact = () => {
                   }}
                 >
                   <BusinessIcon sx={{ color: theme.palette.warning.main, fontSize: 24 }} />
-                  <Typography variant="body2" sx={{ fontSize: "0.875rem", color: theme.palette.text.primary }}>
-                    Wing Aviators
+                  <Typography
+                    variant="body2"
+                    sx={{ fontSize: "0.875rem", color: theme.palette.text.primary }}
+                  >
+                    EkoForge 
                   </Typography>
                 </Box>
               </MotionBox>
