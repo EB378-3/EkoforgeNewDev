@@ -55,3 +55,4 @@ npm i sharp
 npm install @fullcalendar/react @fullcalendar/daygrid @fullcalendar/timegrid @fullcalendar/interaction @fullcalendar/core
 npm i date-fns
 npm i react-player
+npm install @mui/x-charts

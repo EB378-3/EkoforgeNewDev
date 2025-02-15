@@ -6,6 +6,9 @@ import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 import BookIcon from '@mui/icons-material/Book';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import BroadcastOnHomeIcon from '@mui/icons-material/BroadcastOnHome';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
 import {
   RefineSnackbarProvider,
   useNotificationProvider,
@@ -16,8 +19,8 @@ import { cookies } from "next/headers";
 import React, { Suspense } from "react";
 
 import { ColorModeContextProvider } from "@/contexts/color-mode";
-import { authProviderClient } from "../../providers/auth-provider/auth-provider.client";
-import { dataProvider } from "../../providers/data-provider";
+import { authProviderClient } from "@/providers/auth-provider/auth-provider.client";
+import { dataProvider } from "@/providers/data-provider";
 import type { Viewport } from "next";
 
 
@@ -102,6 +105,14 @@ export default async function RootLayout({
                       notificationProvider={useNotificationProvider}
                       resources={[
                         {
+                          name: "forge",
+                          list: `/${locale}/forge`,
+                          meta: {
+                            icon: <BroadcastOnHomeIcon />,
+                            label: "The Forge",
+                          },
+                        },
+                        {
                           name: "profiles",
                           list: `/${locale}/profile`,
                           edit: `/${locale}/profile/edit/:id`,
@@ -111,38 +122,27 @@ export default async function RootLayout({
                           },
                         },
                         {
-                          name: "logbook",
-                          list: `/${locale}/logbook`,
-                          create: `/${locale}/logbook/create`,
-                          edit: `/${locale}/logbook/edit/:id`,
-                          show: `/${locale}/logbook/show/:id`,
+                          name: "crm",
+                          list: `/${locale}/crm`,
+                          create: `/${locale}/crm/create`,
+                          edit: `/${locale}/crm/edit/:id`,
+                          show: `/${locale}/crm/show/:id`,
                           meta: {
                             canDelete: true,
                             icon: <BookIcon />,
+                            label: "CRM",
                           },
                         },
                         {
-                          name: "cal",
-                          list: `/${locale}/booking`,
-                          create: `/${locale}/booking/create`,
-                          edit: `/${locale}/booking/edit/:id`,
-                          show: `/${locale}/booking/show/:id`,
+                          name: "calendar",
+                          list: `/${locale}/calendar`,
+                          create: `/${locale}/calendar/create`,
+                          edit: `/${locale}/calendar/edit/:id`,
+                          show: `/${locale}/calendar/show/:id`,
                           meta: {
                             canDelete: true,
                             icon: <CalendarMonthIcon />,
-                            label: "Bookings",
-                          },
-                        },
-                        {
-                          name: "Admin",
-                          list: `/${locale}/admin`,
-                          create: `/${locale}/admin/create`,
-                          edit: `/${locale}/admin/edit/:id`,
-                          show: `/${locale}/admin/show/:id`,
-                          meta: {
-                            canDelete: true,
-                            icon: <CalendarMonthIcon />,
-                            label: "Admin",
+                            label: "Calendar",
                           },
                         },
                         {
@@ -153,7 +153,18 @@ export default async function RootLayout({
                           show: `/${locale}/resource/show/:id`,
                           meta: {
                             canDelete: true,
-                            icon: <CalendarMonthIcon />,
+                            icon: <LibraryBooksIcon />,
+                          },
+                        },
+                        {
+                          name: "ledger",
+                          list: `/${locale}/ledger`,
+                          create: `/${locale}/ledger/create`,
+                          edit: `/${locale}/ledger/edit/:id`,
+                          show: `/${locale}/ledger/show/:id`,
+                          meta: {
+                            canDelete: true,
+                            icon: <RequestQuoteIcon />,
                           },
                         },
                       ]}
