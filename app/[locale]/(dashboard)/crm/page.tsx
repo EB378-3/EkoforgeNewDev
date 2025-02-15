@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import {
   Box,
   AppBar,
@@ -12,13 +13,21 @@ import {
   Grid,
   Card,
   CardContent,
+  CardMedia,
   Divider,
   useMediaQuery,
   useTheme,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { LineChart } from "@mui/x-charts/LineChart";
+import { List as MuiList } from "@refinedev/mui";
+import { useList } from "@refinedev/core";
 
+// --- Dummy Data for Charts ---
 const salesData = [
   { month: "Jan", sales: 4000 },
   { month: "Feb", sales: 3000 },
@@ -49,24 +58,46 @@ const growthData = [
   { month: "Dec", customers: 220 },
 ];
 
-const recentContacts = [
-  { id: 1, name: "Alice Johnson", email: "alice@example.com", phone: "555-1234" },
-  { id: 2, name: "Bob Smith", email: "bob@example.com", phone: "555-5678" },
-  { id: 3, name: "Carol White", email: "carol@example.com", phone: "555-9012" },
+// --- Type Definitions ---
+interface Client {
+  id: string;
+  client: string;
+  status: string;
+  signed_date: string;
+  email: string;
+  phone: string;
+  website: string;
+  primary_contact: string;
+}
+
+interface Deal {
+  id: string;
+  title: string;
+  amount: string;
+  status: string;
+  deal_date: string;
+}
+
+interface Activity {
+  id: string;
+  title: string;
+  description: string;
+}
+
+// --- Dummy Arrays for Deals and Activities ---
+const openDeals: Deal[] = [
+  { id: "1", title: "Deal 1", amount: "$10,000", status: "Negotiation", deal_date: "2023-01-01" },
+  { id: "2", title: "Deal 2", amount: "$15,000", status: "Proposal", deal_date: "2023-02-01" },
+  { id: "3", title: "Deal 3", amount: "$8,000", status: "Prospect", deal_date: "2023-03-01" },
 ];
 
-const openDeals = [
-  { id: 1, title: "Deal 1", amount: "$10,000", status: "Negotiation" },
-  { id: 2, title: "Deal 2", amount: "$15,000", status: "Proposal" },
-  { id: 3, title: "Deal 3", amount: "$8,000", status: "Prospect" },
+const recentActivities: Activity[] = [
+  { id: "1", title: "Email Sent", description: "Follow-up email sent to Alice Johnson." },
+  { id: "2", title: "Call Received", description: "Inbound call from Bob Smith regarding deal status." },
+  { id: "3", title: "Meeting Scheduled", description: "Meeting scheduled with Carol White for project discussion." },
 ];
 
-const recentActivities = [
-  { id: 1, title: "Email Sent", description: "Follow-up email sent to Alice Johnson." },
-  { id: 2, title: "Call Received", description: "Inbound call from Bob Smith regarding deal status." },
-  { id: 3, title: "Meeting Scheduled", description: "Meeting scheduled with Carol White for project discussion." },
-];
-
+// --- DataGrid Columns for CRM Records (Reports Section) ---
 const crmColumns: GridColDef[] = [
   { field: "id", headerName: "ID", minWidth: 70 },
   { field: "name", headerName: "Name", minWidth: 150, flex: 1 },
@@ -78,143 +109,182 @@ export default function CRMPage() {
   const theme = useTheme();
   const isLargeScreen = useMediaQuery(theme.breakpoints.up("md"));
 
+  // Fetch recent clients. refine's useList returns an object with a "data" property containing our records.
+  const { data: recentClientsResponse, isLoading: clientsLoading, isError: clientsError } = useList<Client>({
+    resource: "clients",
+    pagination: { pageSize: 5 },
+  });
+  // We expect recentClientsResponse to be in the shape: { data: Client[] }
+  const recentClients: Client[] = recentClientsResponse?.data ?? [];
+
+  // Fetch CRM records for the DataGrid (e.g. a generic resource "crmRecords")
+  const { data: recordsResponse, isLoading: recordsLoading, isError: recordsError } = useList({
+    resource: "crmRecords",
+    pagination: { pageSize: 10 },
+  });
+  // Assume recordsResponse.data is our array of records.
+  const crmRecords = recordsResponse?.data ?? [];
+
   return (
     <Box>
-      <CssBaseline />
-      <GlobalStyles styles={{ body: { backgroundColor: "#f5f5f5" } }} />
-
-      {/* AppBar Navigation */}
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            My CRM
-          </Typography>
-          <Button color="inherit">Dashboard</Button>
-          <Button color="inherit">Contacts</Button>
-          <Button color="inherit">Deals</Button>
-          <Button color="inherit">Activities</Button>
-          <Button color="inherit">Reports</Button>
-        </Toolbar>
-      </AppBar>
-
       {/* Main Content */}
       <Box sx={{ p: 2 }}>
-        {/* Charts Section (visible only on large screens) */}
-        {isLargeScreen && (
-          <Grid container spacing={4} sx={{ mb: 4 }}>
-            <Grid item xs={12} md={6}>
-              <Card sx={{ p: 2 }}>
-                <Typography variant="h6" gutterBottom>
-                  Sales Overview
-                </Typography>
-                <Box sx={{ height: 250 }}>
-                  <LineChart
-                    dataset={salesData} // Add this line
-                    xAxis={[{ dataKey: "month", scaleType: "band" }]}
-                    series={[
-                      {
-                        id: "sales",
-                        type: "line",
-                        data: salesData.map((item) => item.sales),
-                        dataKey: "sales",
-                        color: theme.palette.primary.main,
-                      },
-                    ]}
-                    tooltip={{}}
-                    legend={{}}
-                  />
-                </Box>
-              </Card>
+        {/* Dashboard Section */}
+        <Box id="dashboard" sx={{ mb: 4 }}>
+          <Typography variant="h4" gutterBottom>
+            Dashboard
+          </Typography>
+          {isLargeScreen && (
+            <Grid container spacing={4} sx={{ mb: 4 }}>
+              <Grid item xs={12} md={6}>
+                <Card sx={{ p: 2, backgroundColor: theme.palette.strong.default }}>
+                  <Typography variant="h6" gutterBottom>
+                    Sales Overview
+                  </Typography>
+                  <Box sx={{ height: 250 }}>
+                    <LineChart
+                      dataset={salesData}
+                      xAxis={[{ dataKey: "month", scaleType: "band" }]}
+                      series={[
+                        {
+                          id: "sales",
+                          type: "line",
+                          data: salesData.map((item) => item.sales),
+                          dataKey: "sales",
+                          color: theme.palette.primary.main,
+                        },
+                      ]}
+                      tooltip={{}}
+                      legend={{}}
+                    />
+                  </Box>
+                </Card>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Card sx={{ p: 2, backgroundColor: theme.palette.strong.default }}>
+                  <Typography variant="h6" gutterBottom>
+                    Customer Growth
+                  </Typography>
+                  <Box sx={{ height: 250 }}>
+                    <LineChart
+                      dataset={growthData}
+                      xAxis={[{ dataKey: "month", scaleType: "band" }]}
+                      series={[
+                        {
+                          id: "growth",
+                          type: "line",
+                          data: growthData.map((item) => item.customers),
+                          dataKey: "customers",
+                          color: theme.palette.secondary.main,
+                        },
+                      ]}
+                      tooltip={{}}
+                      legend={{}}
+                    />
+                  </Box>
+                </Card>
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <Card sx={{ p: 2 }}>
-                <Typography variant="h6" gutterBottom>
-                  Customer Growth
-                </Typography>
-                <Box sx={{ height: 250 }}>
-                  <LineChart
-                    dataset={growthData} // Add this line
-                    xAxis={[{ dataKey: "month", scaleType: "band" }]}
-                    series={[
-                      {
-                        id: "growth",
-                        type: "line",
-                        data: growthData.map((item) => item.customers),
-                        dataKey: "customers",
-                        color: theme.palette.secondary.main,
-                      },
-                    ]}
-                    tooltip={{}}
-                    legend={{}}
-                  />
-                </Box>
-              </Card>
-            </Grid>
-          </Grid>
-        )}
+          )}
+        </Box>
 
         {/* CRM Sections */}
         <Grid container spacing={4}>
-          {/* Recent Contacts */}
+          {/* Recent Clients Section */}
           <Grid item xs={12} md={4}>
-            <Card sx={{ p: 2 }}>
-              <Typography variant="h6" gutterBottom>
-                Recent Contacts
-              </Typography>
-              {recentContacts.map((contact) => (
-                <Box key={contact.id} sx={{ mb: 1 }}>
-                  <Typography variant="subtitle1">{contact.name}</Typography>
-                  <Typography variant="body2">{contact.email}</Typography>
-                  <Typography variant="body2">{contact.phone}</Typography>
-                  <Divider sx={{ my: 1 }} />
-                </Box>
-              ))}
-            </Card>
+            <Box id="clients">
+              <Card sx={{ p: 2, backgroundColor: theme.palette.strong.default }}>
+                <Typography variant="h6" gutterBottom>
+                  Recent Clients
+                </Typography>
+                {clientsLoading ? (
+                  <Typography>Loading clients...</Typography>
+                ) : clientsError ? (
+                  <Typography>Error loading clients.</Typography>
+                ) : (
+                  recentClients.map((client: Client) => (
+                    <Box key={client.id} sx={{ mb: 1 }}>
+                      <Typography variant="subtitle1">{client.client}</Typography>
+                      <Typography variant="body2">{client.status}</Typography>
+                      <Typography variant="body2">{client.signed_date}</Typography>
+                      <Typography variant="body2">{client.email}</Typography>
+                      <Typography variant="body2">{client.phone}</Typography>
+                      <Typography variant="body2">{client.website}</Typography>
+                      <Typography variant="body2">{client.primary_contact}</Typography>
+                      <Divider sx={{ my: 1 }} />
+                    </Box>
+                  ))
+                )}
+              </Card>
+            </Box>
           </Grid>
-          {/* Open Deals */}
+          {/* Open Deals Section */}
           <Grid item xs={12} md={4}>
-            <Card sx={{ p: 2 }}>
-              <Typography variant="h6" gutterBottom>
-                Open Deals
-              </Typography>
-              {openDeals.map((deal) => (
-                <Box key={deal.id} sx={{ mb: 1 }}>
-                  <Typography variant="subtitle1">{deal.title}</Typography>
-                  <Typography variant="body2">{deal.amount}</Typography>
-                  <Typography variant="body2">{deal.status}</Typography>
-                  <Divider sx={{ my: 1 }} />
-                </Box>
-              ))}
-            </Card>
+            <Box id="deals">
+              <Card sx={{ p: 2, backgroundColor: theme.palette.strong.default }}>
+                <Typography variant="h6" gutterBottom>
+                  Open Deals
+                </Typography>
+                {openDeals.map((deal: Deal) => (
+                  <Box key={deal.id} sx={{ mb: 1 }}>
+                    <Typography variant="subtitle1">{deal.title}</Typography>
+                    <Typography variant="body2">{deal.amount}</Typography>
+                    <Typography variant="body2">{deal.status}</Typography>
+                    <Typography variant="body2">
+                      Date: {new Date(deal.deal_date).toLocaleDateString()}
+                    </Typography>
+                    <Divider sx={{ my: 1 }} />
+                  </Box>
+                ))}
+              </Card>
+            </Box>
           </Grid>
-          {/* Recent Activities */}
+          {/* Recent Activities Section */}
           <Grid item xs={12} md={4}>
-            <Card sx={{ p: 2 }}>
-              <Typography variant="h6" gutterBottom>
-                Recent Activities
-              </Typography>
-              {recentActivities.map((activity) => (
-                <Box key={activity.id} sx={{ mb: 1 }}>
-                  <Typography variant="subtitle1">{activity.title}</Typography>
-                  <Typography variant="body2">{activity.description}</Typography>
-                  <Divider sx={{ my: 1 }} />
-                </Box>
-              ))}
-            </Card>
+            <Box id="activities">
+              <Card sx={{ p: 2, backgroundColor: theme.palette.strong.default }}>
+                <Typography variant="h6" gutterBottom>
+                  Recent Activities
+                </Typography>
+                {recentActivities.map((activity: Activity) => (
+                  <Box key={activity.id} sx={{ mb: 1 }}>
+                    <Typography variant="subtitle1">{activity.title}</Typography>
+                    <Typography variant="body2">{activity.description}</Typography>
+                    <Divider sx={{ my: 1 }} />
+                  </Box>
+                ))}
+              </Card>
+            </Box>
           </Grid>
         </Grid>
 
-        {/* DataGrid Section for additional CRM records */}
-        <Box sx={{ mt: 4 }}>
-          <Typography variant="h5" gutterBottom>
-            CRM Records
-          </Typography>
-          <Card sx={{ height: 500, p: 2 }}>
-            {/* Replace rows and columns with your actual CRM data */}
-            <DataGrid rows={[]} columns={crmColumns} />
+        {/* Reports Section */}
+        <Box id="reports" sx={{ mt: 4 }}>
+          <Card sx={{ height: 500, p: 2, backgroundColor: theme.palette.strong.default }}>
+            <Typography variant="h5" gutterBottom>
+              CRM Records
+            </Typography>
+            <MuiList title={<Typography variant="h5">CRM Records</Typography>}>
+              <DataGrid rows={crmRecords} columns={crmColumns} />
+            </MuiList>
           </Card>
         </Box>
       </Box>
     </Box>
   );
+}
+
+// Define Deal and Activity interfaces for type safety.
+interface Deal {
+  id: string;
+  title: string;
+  amount: string;
+  status: string;
+  deal_date: string;
+}
+
+interface Activity {
+  id: string;
+  title: string;
+  description: string;
 }

@@ -122,7 +122,7 @@ export default async function RootLayout({
                           },
                         },
                         {
-                          name: "crm",
+                          name: "clients",
                           list: `/${locale}/crm`,
                           create: `/${locale}/crm/create`,
                           edit: `/${locale}/crm/edit/:id`,
