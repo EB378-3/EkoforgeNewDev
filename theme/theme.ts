@@ -2,6 +2,20 @@
 import { createTheme } from "@mui/material/styles";
 import { RefineThemes } from "@refinedev/mui";
 
+// Extend MUI's palette to include the custom "strong" property.
+declare module "@mui/material/styles" {
+  interface Palette {
+    strong: {
+      default: string;
+    };
+  }
+  interface PaletteOptions {
+    strong?: {
+      default?: string;
+    };
+  }
+}
+
 // Light theme using RefineThemes.Orange.
 export const lightTheme = createTheme(RefineThemes.Orange, {
   palette: {
@@ -40,6 +54,9 @@ export const lightTheme = createTheme(RefineThemes.Orange, {
       light: "#81c784",
       dark: "#388e3c",
       contrastText: "#000000",
+    },
+    strong: {
+      default: "#ffffff",
     },
   },
 });
@@ -82,6 +99,9 @@ export const darkTheme = createTheme(RefineThemes.OrangeDark, {
       light: "#81c784",
       dark: "#388e3c",
       contrastText: "#ffffff",
+    },
+    strong: {
+      default: "#000000",
     },
   },
 });

@@ -15,8 +15,6 @@ interface ProfileData {
   country: string;
   zip: string;
   role: string;
-  NF: boolean;
-  IR: boolean;
 }
 
 export default function ProfileEdit() {
@@ -151,17 +149,6 @@ export default function ProfileEdit() {
           InputLabelProps={{ shrink: true }}
           label="Role"
         />
-
-        {/* Qualifications */}
-        <Typography variant="body1" sx={{ mt: 2 }}>
-          Qualifications
-        </Typography>
-        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-          <Typography variant="body2">NF</Typography>
-          <input type="checkbox" {...register("NF")} />
-          <Typography variant="body2">IR</Typography>
-          <input type="checkbox" {...register("IR")} />
-        </Box>
       </Box>
     </Edit>
   );

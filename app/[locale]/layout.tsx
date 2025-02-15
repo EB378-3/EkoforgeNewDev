@@ -26,7 +26,7 @@ import type { Viewport } from "next";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
-  : "http://wingtemplate.netlify.app";
+  : "http://ekoforge.com";
 
 const APP_NAME = "EkoForge";
 const APP_DEFAULT_TITLE = "EkoForge";

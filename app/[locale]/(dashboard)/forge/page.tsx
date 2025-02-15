@@ -10,7 +10,9 @@ import {
   Paper,
   useMediaQuery,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import { useLocale, useTranslations } from "next-intl";
+import { getTheme } from "@theme/theme";
+import { useColorMode } from "@contexts/color-mode";
 import { LineChart } from "@mui/x-charts/LineChart";
 
 const salesData = [
@@ -29,15 +31,15 @@ const salesData = [
 ];
 
 export default function ForgeDashboard() {
-  const theme = useTheme();
+  const t = useTranslations("hompage");
+  const locale = useLocale();
+  const { mode, setMode } = useColorMode();
+  const theme = getTheme(mode);
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
     <Box sx={{ p: { xs: 2, md: 4 } }}>
       {/* Header */}
-      <Typography variant="h4" gutterBottom>
-        Dashboard
-      </Typography>
 
       {/* Action Buttons */}
       <Stack
@@ -46,10 +48,13 @@ export default function ForgeDashboard() {
         sx={{ mb: 4 }}
         alignItems="center"
       >
-        <Button variant="contained" color="primary">
+        <Typography variant="h4" gutterBottom>
+          Dashboard
+        </Typography>
+        <Button variant="contained" sx={{ backgroundColor: theme.palette.primary.dark }}>
           Onboard New Client
         </Button>
-        <Button variant="contained" color="secondary">
+        <Button variant="contained" sx={{ backgroundColor: theme.palette.secondary.dark }}>
           Add New Transaction
         </Button>
         <Button variant="outlined" color="primary">
@@ -61,7 +66,7 @@ export default function ForgeDashboard() {
       <Grid container spacing={3}>
         {/* Sales Overview Chart */}
         <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 2 }}>
+          <Paper sx={{ p: 2, backgroundColor: theme.palette.strong.default }}>
             <Typography variant="h6" gutterBottom>
               Sales Overview
             </Typography>
@@ -92,7 +97,7 @@ export default function ForgeDashboard() {
 
         {/* Noticeboard */}
         <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 2, height: "100%" }}>
+          <Paper sx={{ p: 2, height: "100%", backgroundColor: theme.palette.strong.default }}>
             <Typography variant="h6" gutterBottom>
               Noticeboard
             </Typography>
@@ -115,7 +120,7 @@ export default function ForgeDashboard() {
 
         {/* Recent Transactions */}
         <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 2 }}>
+          <Paper sx={{ p: 2, backgroundColor: theme.palette.strong.default }}>
             <Typography variant="h6" gutterBottom>
               Recent Transactions
             </Typography>
@@ -127,7 +132,7 @@ export default function ForgeDashboard() {
 
         {/* Quick Stats */}
         <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 2 }}>
+          <Paper sx={{ p: 2, backgroundColor: theme.palette.strong.default }}>
             <Typography variant="h6" gutterBottom>
               Quick Stats
             </Typography>
