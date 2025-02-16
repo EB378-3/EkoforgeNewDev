@@ -7,12 +7,11 @@ import { useLocale, useTranslations } from "next-intl";
 import { getTheme } from "@theme/theme";
 import { useColorMode } from "@contexts/color-mode";
 
-const locale = useLocale();
-const { mode, setMode } = useColorMode();
-const theme = getTheme(mode);
-
-const crmNav: React.FC = () => {
+const CrmNav = () => {
   const t = useTranslations("crm");
+  const locale = useLocale();
+  const { mode, setMode } = useColorMode();
+  const theme = getTheme(mode);
 
   return (
     <>
@@ -43,4 +42,4 @@ const crmNav: React.FC = () => {
   );
 };
 
-export default crmNav;
+export default CrmNav;
