@@ -6,8 +6,7 @@
     "background_color":"#ffffff",
     "display":"standalone",
     "orientation":"any",
-    "scope":"/",
-    "start_url":"/[locale]/forge",
+    "start_url":"/[locale]/profile",
     "icons":[
         {
             "src":"icons/16x16.png",
