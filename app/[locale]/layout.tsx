@@ -26,7 +26,7 @@ import type { Viewport } from "next";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
-  : "http://ekoforge.com";
+  : "https://ekoforge.com";
 
 const APP_NAME = "EkoForge";
 const APP_DEFAULT_TITLE = "EkoForge";
