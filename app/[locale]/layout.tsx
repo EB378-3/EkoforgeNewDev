@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     template: APP_TITLE_TEMPLATE,
   }, // default title
   description: APP_DESCRIPTION,
-  manifest: "public/manifest.json",
+  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
