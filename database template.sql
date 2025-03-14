@@ -18,26 +18,6 @@ CREATE TABLE public.profiles (
 ) TABLESPACE pg_default;
 
 -- ===============================================================
--- Create a Trigger Function to Auto-Create a Profile for a New User
--- ===============================================================
-CREATE OR REPLACE FUNCTION public.create_profile_for_new_user()
-RETURNS trigger AS $$
-BEGIN
-  INSERT INTO public.profiles (id, first_name, last_name, email)
-  VALUES (NEW.id, '', '', NEW.email);
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- ===============================================================
--- Create a Trigger on auth.users to Invoke the Function After Insert
--- ===============================================================
-CREATE TRIGGER trg_create_profile_for_new_user
-AFTER INSERT ON auth.users
-FOR EACH ROW
-EXECUTE FUNCTION public.create_profile_for_new_user();
-
--- ===============================================================
 -- 2. Create the Admins Table with a foreign key to Profiles
 -- ===============================================================
 CREATE TABLE public.admins (
@@ -91,7 +71,7 @@ CREATE TABLE IF NOT EXISTS public.notices (
     title VARCHAR(255) NOT NULL,
     message TEXT NOT NULL,
     time_off_incident TIMESTAMP with time zone,  -- When the time off incident occurred
-    submitted_by uuid NOT NULL,                    -- Profile/User who submitted the notice
+    submitted_by uuid NOT NULL default auth.uid (),                    -- Profile/User who submitted the notice
     extra_parameters JSONB DEFAULT NULL,           -- Additional parameters stored as JSON
     created_at TIMESTAMP with time zone NOT NULL DEFAULT now(),
     updated_at TIMESTAMP with time zone NOT NULL DEFAULT now(),
@@ -182,7 +162,7 @@ CREATE POLICY resources_write_rls ON public.resources
 -- ===============================================================
 CREATE TABLE public.logbook (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  profile_id uuid NOT NULL,
+  profile_id uuid NOT NULL default auth.uid (),
   resource_id uuid NOT NULL,
   
   -- Original columns
@@ -335,7 +315,7 @@ EXECUTE FUNCTION public.update_flight_hours_summary();
 -- ===============================================================
 CREATE TABLE IF NOT EXISTS public.flightplans (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    profile_id uuid NOT NULL,  -- Profile who created the plan
+    profile_id uuid NOT NULL default auth.uid (),  -- Profile who created the plan
     route text NOT NULL,
     notes text,
     created_at TIMESTAMP with time zone NOT NULL DEFAULT now(),
@@ -365,7 +345,7 @@ CREATE POLICY flightplans_rls ON public.flightplans
 -- ===============================================================
 CREATE TABLE IF NOT EXISTS public.bookings (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    profile_id uuid NOT NULL,    -- The person making the booking
+    profile_id uuid NOT NULL default auth.uid (),    -- The person making the booking
     resource_id uuid NOT NULL,    -- References public.resources.id
     instructor_id uuid NULL,     -- References public.instructors.id
     start_time TIMESTAMP with time zone NOT NULL,
@@ -409,7 +389,7 @@ CREATE POLICY bookings_select_rls ON public.bookings
 -- ===============================================================
 CREATE TABLE IF NOT EXISTS public.blogs (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    profile_id uuid NOT NULL,
+    profile_id uuid NOT NULL default auth.uid (),
     title VARCHAR(255) NOT NULL,
     content text NOT NULL,
     published_at TIMESTAMP with time zone DEFAULT NULL,
