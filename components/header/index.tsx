@@ -9,15 +9,29 @@ import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { useGetIdentity } from "@refinedev/core";
+import { useGetIdentity, useShow } from "@refinedev/core";
 import { HamburgerMenu, RefineThemedLayoutV2HeaderProps } from "@refinedev/mui";
 import React, { useContext } from "react";
+import Lang from "@components/ui/Lang";
+import { Button, Link } from "@mui/material";
 
 type IUser = {
   id: number;
   name: string;
   avatar: string;
 };
+
+function ProfileAvatar({ profileId }: { profileId: string }) {
+    const { queryResult } = useShow({
+        resource: "profiles",
+        id: profileId,
+        meta: { select: "avatar_url" },
+        queryOptions: { enabled: !!profileId },
+    });
+    const profileData = queryResult?.data?.data as { avatar_url: string;} | undefined;
+    if (!profileData) return <span>Loading...</span>;
+    return <Avatar src={profileData.avatar_url} alt={"pfp"} />;
+}
 
 export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({
   sticky = true,
@@ -42,6 +56,7 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({
             justifyContent="flex-end"
             alignItems="center"
           >
+            <Lang />
             <IconButton
               color="inherit"
               onClick={() => {
@@ -71,8 +86,20 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({
                     {user?.name}
                   </Typography>
                 )}
-                <Avatar src={user?.avatar} alt={user?.name} />
+                <ProfileAvatar profileId={user.id.toString()} />
               </Stack>
+            )}
+            {!user && (
+              <Button
+                variant="contained"
+                color="primary"
+                component={Link}
+                href="/login"
+                sx={{ 
+                }}
+              >
+                Login
+              </Button>
             )}
           </Stack>
         </Stack>

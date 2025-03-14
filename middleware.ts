@@ -5,7 +5,7 @@ import type { NextRequest } from "next/server";
 // Create the next-intl middleware instance with your locales.
 const intlMiddleware = NextIntlMiddleware({
   locales: ['en', 'fi'], // update these locales as needed
-  defaultLocale: 'en',
+  defaultLocale: 'fi', // update this default locale as needed
 });
 
 export async function middleware(request: NextRequest) {
@@ -22,6 +22,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|json)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|json|ico)$).*)",
   ],
 };
