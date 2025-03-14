@@ -9,7 +9,7 @@ import {
 } from "@refinedev/mui";
 import { useShow, useTable } from "@refinedev/core";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Stack } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 
 interface Notice {
     id: string;
@@ -22,6 +22,26 @@ interface Notice {
     updated_at: string;
 }
 
+// Helper component to display extra parameters in a readable format.
+function ExtraParametersDisplay({ value }: { value: any }) {
+    if (!value || (typeof value === "object" && Object.keys(value).length === 0)) {
+        return <Typography variant="body2" color="text.secondary">None</Typography>;
+    }
+
+    if (typeof value === "object") {
+        return (
+            <Box>
+                {Object.entries(value).map(([key, val]) => (
+                    <Typography variant="body2" color="text.secondary" key={key}>
+                        <strong>{key}:</strong> {typeof val === "object" ? JSON.stringify(val) : String(val)}
+                    </Typography>
+                ))}
+            </Box>
+        );
+    }
+    return <Typography variant="body2" color="text.secondary">{String(value)}</Typography>;
+}
+
 // Component to display a profile's full name based on profileId.
 function ProfileName({ profileId }: { profileId: string }) {
     const { queryResult } = useShow({
@@ -31,8 +51,12 @@ function ProfileName({ profileId }: { profileId: string }) {
         queryOptions: { enabled: !!profileId },
     });
     const profileData = queryResult?.data?.data as { first_name: string; last_name: string } | undefined;
-    if (!profileData) return <span>Loading...</span>;
-    return <span>{profileData.first_name} {profileData.last_name}</span>;
+    if (!profileData) return <Typography variant="caption">Loading...</Typography>;
+    return (
+        <Typography variant="caption">
+            {profileData.first_name} {profileData.last_name}
+        </Typography>
+    );
 }
 
 export default function NoticesList() {
@@ -64,8 +88,8 @@ export default function NoticesList() {
         {
             field: "extra_parameters",
             headerName: "Extra Parameters",
-            width: 100,
-            renderCell: ({ value }) => JSON.stringify(value),
+            width: 200,
+            renderCell: ({ value }) => <ExtraParametersDisplay value={value} />,
         },
         {
             field: "submitted_by",
@@ -75,7 +99,7 @@ export default function NoticesList() {
         },
         {
             field: "time_off_incident",
-            headerName: "time_off_incident",
+            headerName: "Time Off Incident",
             width: 180,
             renderCell: ({ value }) => new Date(value).toLocaleString(),
         },
