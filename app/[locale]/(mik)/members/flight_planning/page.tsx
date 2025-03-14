@@ -16,12 +16,12 @@ interface FlightPlan {
     profile_id: string;
     route: string;
     notes?: string;
+    international?: boolean;
     created_at: string;
     updated_at: string;
 }
 
-
-export default function LogbookList() {
+export default function FlightPlanList() {
     const {
         tableQueryResult,
         pageCount,
@@ -30,35 +30,34 @@ export default function LogbookList() {
         pageSize,
         setPageSize,
     } = useTable<FlightPlan>({
-        resource: "flightplans", // This must match your resource configuration
+        resource: "flightplans", // Ensure this matches your resource configuration
         initialSorter: [
             {
-                field: "id",
+                field: "updated_at",
                 order: "asc",
+            },
+        ],
+        // Exclude rows where international is true.
+        initialFilter: [
+            {
+                field: "international",
+                operator: "ne",
+                value: true,
             },
         ],
         initialPageSize: 10,
     });
 
+    // If your data provider returns total count, use it; otherwise, fallback
+    const total =
+        tableQueryResult?.data?.total ??
+        (pageCount ? pageCount * pageSize : 0);
     const rows = tableQueryResult?.data?.data ?? [];
-    const total = pageCount * pageSize;
 
     const columns: GridColDef[] = [
-        { field: "flight_date", headerName: "Flight Date", width: 150 },
-        { field: "route", headerName: "Route", width: 150 },
-        { field: "notes", headerName: "Notes", width: 150 },
-        {
-            field: "created_at",
-            headerName: "Created At",
-            width: 180,
-            renderCell: ({ value }) => new Date(value).toLocaleString(),
-        },
-        {
-            field: "updated_at",
-            headerName: "Updated At",
-            width: 180,
-            renderCell: ({ value }) => new Date(value).toLocaleString(),
-        },
+        { field: "id", headerName: "ID", width: 150 },
+        { field: "route", headerName: "Route", width: 250 },
+        { field: "notes", headerName: "Notes", width: 200 },
         {
             field: "actions",
             headerName: "Actions",
@@ -69,21 +68,18 @@ export default function LogbookList() {
                         hideText
                         size="small"
                         variant="outlined"
-                        resourceNameOrRouteName="logbook"
                         recordItemId={row.id}
                     />
                     <ShowButton
                         hideText
                         size="small"
                         variant="outlined"
-                        resourceNameOrRouteName="logbook"
                         recordItemId={row.id}
                     />
                     <DeleteButton
                         hideText
                         size="small"
                         variant="outlined"
-                        resourceNameOrRouteName="logbook"
                         recordItemId={row.id}
                     />
                 </Stack>
@@ -94,7 +90,7 @@ export default function LogbookList() {
     ];
 
     return (
-        <List title="FlightPlans">
+        <List title="Flightplans">
             <DataGrid
                 autoHeight
                 rows={rows}

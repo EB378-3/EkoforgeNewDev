@@ -6,41 +6,36 @@ import {
     EditButton,
     ShowButton,
     DeleteButton,
-    } from "@refinedev/mui";
-import { useOne, useTable } from "@refinedev/core";
+} from "@refinedev/mui";
+import { useShow, useTable } from "@refinedev/core";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Stack, Typography } from "@mui/material";
+import { Stack } from "@mui/material";
 
-// Define the FlightPlan interface based on your table.
-interface FlightPlan {
+interface Notice {
     id: string;
-    profile_id: string;
-    route: string;
-    notes?: string;
+    title: string;
+    message: string;
+    time_off_incident?: string;
+    submitted_by: string;
+    extra_parameters?: Record<string, any>;
     created_at: string;
     updated_at: string;
 }
 
 // Component to display a profile's full name based on profileId.
 function ProfileName({ profileId }: { profileId: string }) {
-    const { data } = useOne({
+    const { queryResult } = useShow({
         resource: "profiles",
         id: profileId,
         meta: { select: "first_name,last_name" },
         queryOptions: { enabled: !!profileId },
     });
-    const profileData = data?.data as
-      | { first_name: string; last_name: string }
-      | undefined;
-    if (!profileData) return <Typography variant="caption">Loading...</Typography>;
-    return (
-        <Typography variant="caption">
-            {profileData.first_name} {profileData.last_name}
-        </Typography>
-    );
+    const profileData = queryResult?.data?.data as { first_name: string; last_name: string } | undefined;
+    if (!profileData) return <span>Loading...</span>;
+    return <span>{profileData.first_name} {profileData.last_name}</span>;
 }
 
-export default function FlightPlansList() {
+export default function NoticesList() {
     const {
         tableQueryResult,
         pageCount,
@@ -48,9 +43,14 @@ export default function FlightPlansList() {
         setCurrent,
         pageSize,
         setPageSize,
-    } = useTable<FlightPlan>({
-        resource: "flightplans",
-        initialSorter: [{ field: "created_at", order: "desc" }],
+    } = useTable<Notice>({
+        resource: "notices", // This must match your resource configuration
+        initialSorter: [
+            {
+                field: "id",
+                order: "asc",
+            },
+        ],
         initialPageSize: 10,
     });
 
@@ -58,24 +58,24 @@ export default function FlightPlansList() {
     const total = pageCount * pageSize;
 
     const columns: GridColDef[] = [
-        { field: "id", headerName: "ID", width: 250 },
+        { field: "id", headerName: "ID", width: 25 },
+        { field: "title", headerName: "Title", width: 120 },
+        { field: "message", headerName: "Message", width: 200 },
         {
-            field: "profile_id",
-            headerName: "Created By",
+            field: "extra_parameters",
+            headerName: "Extra Parameters",
+            width: 100,
+            renderCell: ({ value }) => JSON.stringify(value),
+        },
+        {
+            field: "submitted_by",
+            headerName: "Submitted By",
             width: 150,
-            renderCell: (params) => <ProfileName profileId={params.row.profile_id} />,
-        },
-        { field: "route", headerName: "Route", width: 200 },
-        { field: "notes", headerName: "Notes", width: 300 },
-        {
-            field: "created_at",
-            headerName: "Created At",
-            width: 180,
-            renderCell: ({ value }) => new Date(value).toLocaleString(),
+            renderCell: (params) => <ProfileName profileId={params.row.submitted_by} />,
         },
         {
-            field: "updated_at",
-            headerName: "Updated At",
+            field: "time_off_incident",
+            headerName: "time_off_incident",
             width: 180,
             renderCell: ({ value }) => new Date(value).toLocaleString(),
         },
@@ -89,21 +89,21 @@ export default function FlightPlansList() {
                         hideText
                         size="small"
                         variant="outlined"
-                        resourceNameOrRouteName="flightplans"
+                        resourceNameOrRouteName="notices"
                         recordItemId={row.id}
                     />
                     <ShowButton
                         hideText
                         size="small"
                         variant="outlined"
-                        resourceNameOrRouteName="flightplans"
+                        resourceNameOrRouteName="notices"
                         recordItemId={row.id}
                     />
                     <DeleteButton
                         hideText
                         size="small"
                         variant="outlined"
-                        resourceNameOrRouteName="flightplans"
+                        resourceNameOrRouteName="notices"
                         recordItemId={row.id}
                     />
                 </Stack>
@@ -114,7 +114,7 @@ export default function FlightPlansList() {
     ];
 
     return (
-        <List title="Flight Plans">
+        <List title="Notices">
             <DataGrid
                 autoHeight
                 rows={rows}

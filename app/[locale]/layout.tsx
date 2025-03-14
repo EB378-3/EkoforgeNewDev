@@ -171,7 +171,7 @@ export default async function RootLayout({
                           },
                         },
                         {
-                          name: "notice",
+                          name: "notices",
                           list: `/${locale}/members/saftey_notice`,
                           create: `/${locale}/members/saftey_notice/create`,
                           edit: `/${locale}/members/saftey_notice/edit/:id`,
@@ -194,6 +194,7 @@ export default async function RootLayout({
                         },
                         {
                           name: "flightplans",
+                          identifier: "flight_planning_local",
                           list: `/${locale}/members/flight_planning`,
                           create: `/${locale}/members/flight_planning/create`,
                           edit: `/${locale}/members/flight_planning/edit/:id`,
