@@ -1,142 +1,129 @@
 "use client";
 
 import React from "react";
+import {
+  Box,
+  TextField,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
+import { Create } from "@refinedev/mui";
+import { useForm } from "@refinedev/react-hook-form";
+import { Controller } from "react-hook-form";
 import { useTranslations } from "next-intl";
-import NextLink from "next/link";
-import { motion } from "framer-motion";
-import { Box, Container, Typography, Button } from "@mui/material";
-import { useColorMode } from "@contexts/color-mode";
-import { getTheme } from "@theme/theme";
 
-const AboutBusinessPage: React.FC = () => {
-  const t = useTranslations("AboutBusiness");
-  const { mode } = useColorMode();
-    const theme = getTheme(mode);
+interface Booking {
+  profile_id: string;
+  resource_id: string;
+  start_time: string;
+  end_time: string;
+}
 
-  // Animation variants for Framer Motion.
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 1 } },
-  };
+interface Resource {
+  id: string;
+  name: string;
+}
 
-  const slideInRight = {
-    hidden: { opacity: 0, x: 100 },
-    visible: { opacity: 1, x: 0, transition: { duration: 1 } },
-  };
+// Dummy resource options. Replace with your API data as needed.
+const resourceOptions: Resource[] = [
+  { id: "1", name: "Conference Room A" },
+  { id: "2", name: "Conference Room B" },
+  { id: "3", name: "Office Desk" },
+];
+
+export default function BookingCreatePage() {
+  const t = useTranslations("Bookings");
+
+  const {
+    saveButtonProps,
+    register,
+    control,
+    formState: { errors },
+  } = useForm<Booking>({
+    defaultValues: {
+      profile_id: "",
+      resource_id: "",
+      start_time: "",
+      end_time: "",
+    },
+    refineCoreProps: { meta: { select: "*" } },
+  });
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Typography variant="h3" sx={{ fontWeight: "bold", mb: 4, textAlign: "center" }}>
-        {t("title")}
-      </Typography>
+    <Create
+      title={t("createBookingTitle") || "Create Booking"}
+      isLoading={false}
+      saveButtonProps={saveButtonProps}
+    >
+      <Box
+        component="form"
+        sx={{ display: "flex", flexDirection: "column", gap: 2, p: 4 }}
+        autoComplete="off"
+      >
+        {/* Profile ID */}
+        <TextField
+          fullWidth
+          label={t("profileIdLabel") || "Profile ID"}
+          {...register("profile_id", {
+            required: t("profileIdRequired") || "Profile ID is required",
+          })}
+          error={!!errors.profile_id}
+          helperText={errors.profile_id ? String(errors.profile_id.message) : ""}
+        />
 
-      <Box component={motion.div} initial="hidden" whileInView="visible" variants={fadeInUp}>
-        <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.6 }}>
-          {t("introParagraph1")}
-        </Typography>
-        <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.6 }}>
-          {t("introParagraph2")}
-        </Typography>
+        {/* Resource Selector */}
+        <Controller
+          name="resource_id"
+          control={control}
+          rules={{ required: t("resourceIdRequired") || "Resource is required" }}
+          render={({ field }) => (
+            <FormControl fullWidth error={!!errors.resource_id}>
+              <InputLabel>{t("resourceIdLabel") || "Resource"}</InputLabel>
+              <Select label={t("resourceIdLabel") || "Resource"} {...field}>
+                {resourceOptions.map((resource) => (
+                  <MenuItem key={resource.id} value={resource.id}>
+                    {resource.name}
+                  </MenuItem>
+                ))}
+              </Select>
+              {errors.resource_id && (
+                <Typography variant="caption" color="error">
+                  {typeof errors.resource_id.message === "string" && errors.resource_id.message}
+                </Typography>
+              )}
+            </FormControl>
+          )}
+        />
 
-        <Typography variant="h5" sx={{ fontWeight: "bold", mt: 4, mb: 2 }}>
-          {t("harshRealityTitle")}
-        </Typography>
-        <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.6 }}>
-          {t("harshRealityText")}
-        </Typography>
-        <Box component="ul" sx={{ ml: 3, mb: 2 }}>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("harshRealityListItem1")}
-          </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("harshRealityListItem2")}
-          </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("harshRealityListItem3")}
-          </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("harshRealityListItem4")}
-          </Typography>
-          <Typography component="li" variant="body1">
-            {t("harshRealityListItem5")}
-          </Typography>
-        </Box>
+        {/* Start Time */}
+        <TextField
+          fullWidth
+          label={t("startTimeLabel") || "Start Time"}
+          {...register("start_time", {
+            required: t("startTimeRequired") || "Start Time is required",
+          })}
+          error={!!errors.start_time}
+          helperText={errors.start_time ? String(errors.start_time.message) : ""}
+          type="datetime-local"
+          InputLabelProps={{ shrink: true }}
+        />
 
-        <Typography variant="h5" sx={{ fontWeight: "bold", mt: 4, mb: 2 }}>
-          {t("benefitsTitle")}
-        </Typography>
-        <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.6 }}>
-          {t("benefitsIntro")}
-        </Typography>
-        <Box component="ul" sx={{ ml: 3, mb: 2 }}>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("benefitListItem1")}
-          </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("benefitListItem2")}
-          </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("benefitListItem3")}
-          </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("benefitListItem4")}
-          </Typography>
-          <Typography component="li" variant="body1">
-            {t("benefitListItem5")}
-          </Typography>
-        </Box>
-
-        <Typography variant="h5" sx={{ fontWeight: "bold", mt: 4, mb: 2 }}>
-          {t("packageTitle")}
-        </Typography>
-        <Box component="ul" sx={{ ml: 3, mb: 2 }}>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("packageListItem1")}
-          </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("packageListItem2")}
-          </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("packageListItem3")}
-          </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("packageListItem4")}
-          </Typography>
-          <Typography component="li" variant="body1">
-            {t("packageListItem5")}
-          </Typography>
-        </Box>
-
-        <Typography variant="h5" sx={{ fontWeight: "bold", mt: 4, mb: 2 }}>
-          {t("finalCallTitle")}
-        </Typography>
-        <Typography variant="body1" sx={{ mb: 4, lineHeight: 1.6 }}>
-          {t("finalCallText")}
-        </Typography>
-
-        <NextLink href={`https://calendly.com/ekoforge`} passHref>
-          <motion.div whileHover={{ scale: 1.05 }}>
-            <Button
-              variant="contained"
-              size="large"
-              sx={{
-                px: 4,
-                py: 1.5,
-                background: `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
-                color: theme.palette.common.white,
-                fontWeight: "bold",
-                borderRadius: 50,
-                boxShadow: 3,
-                textTransform: "none",
-              }}
-            >
-              {t("bookNow")}
-            </Button>
-          </motion.div>
-        </NextLink>
+        {/* End Time */}
+        <TextField
+          fullWidth
+          label={t("endTimeLabel") || "End Time"}
+          {...register("end_time", {
+            required: t("endTimeRequired") || "End Time is required",
+          })}
+          error={!!errors.end_time}
+          helperText={errors.end_time ? String(errors.end_time.message) : ""}
+          type="datetime-local"
+          InputLabelProps={{ shrink: true }}
+        />
       </Box>
-    </Container>
+    </Create>
   );
-};
-
-export default AboutBusinessPage;
+}
