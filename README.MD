@@ -56,3 +56,4 @@ npm install @fullcalendar/react @fullcalendar/daygrid @fullcalendar/timegrid @fu
 npm i date-fns
 npm i react-player
 npm install @mui/x-charts
+npm i @fullcalendar/resource-timeline

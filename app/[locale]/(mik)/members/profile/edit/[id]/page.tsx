@@ -128,9 +128,14 @@ export default function ProfileEditPage() {
                 </Box>
               </CardMedia>
               <CardContent>
-                <Typography variant="body2" color="text.secondary">
-                  Change Avatar (Not Implemented)
-                </Typography>
+                <TextField
+                  fullWidth
+                  label="Change Avatar"
+                  defaultValue={profile.avatar_url}
+                  {...register("avatar_url")}
+                  error={!!errors.avatar_url}
+                  helperText={errors.avatar_url?.message?.toString()}
+                />
               </CardContent>
             </Card>
           </Grid>

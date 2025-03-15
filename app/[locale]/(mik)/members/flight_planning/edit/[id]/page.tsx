@@ -1,142 +1,99 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
+import { Box, Grid, TextField, FormControlLabel, Checkbox, Button, Typography } from "@mui/material";
+import { Edit } from "@refinedev/mui";
+import { useForm } from "@refinedev/react-hook-form";
+import { Controller } from "react-hook-form";
 import { useTranslations } from "next-intl";
-import NextLink from "next/link";
-import { motion } from "framer-motion";
-import { Box, Container, Typography, Button } from "@mui/material";
-import { useColorMode } from "@contexts/color-mode";
-import { getTheme } from "@theme/theme";
 
-const AboutBusinessPage: React.FC = () => {
-  const t = useTranslations("AboutBusiness");
-  const { mode } = useColorMode();
-    const theme = getTheme(mode);
+interface FlightPlan {
+  id: string;
+  profile_id: string;
+  route: string;
+  notes?: string;
+  international?: boolean;
+  created_at: string;
+  updated_at: string;
+}
 
-  // Animation variants for Framer Motion.
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 1 } },
-  };
+export default function FlightPlanEditPage() {
+  const t = useTranslations("FlightPlans");
 
-  const slideInRight = {
-    hidden: { opacity: 0, x: 100 },
-    visible: { opacity: 1, x: 0, transition: { duration: 1 } },
-  };
+  const {
+    saveButtonProps,
+    register,
+    control,
+    reset,
+    formState: { errors },
+    refineCore: { queryResult, formLoading },
+  } = useForm<FlightPlan>({
+    refineCoreProps: { meta: { select: "*" } },
+  });
+
+  const flightPlan = queryResult?.data?.data;
+
+  useEffect(() => {
+    if (flightPlan) {
+      reset(flightPlan);
+    }
+  }, [flightPlan, reset]);
+
+  if (formLoading) {
+    return <Typography>Loading flight plan...</Typography>;
+  }
+
+  if (!flightPlan) {
+    return <Typography>Error loading flight plan</Typography>;
+  }
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Typography variant="h3" sx={{ fontWeight: "bold", mb: 4, textAlign: "center" }}>
-        {t("title")}
-      </Typography>
+    <Edit isLoading={formLoading} saveButtonProps={saveButtonProps}>
+      <Box
+        component="form"
+        sx={{ p: 4, display: "flex", flexDirection: "column", gap: 2 }}
+        autoComplete="off"
+      >
+        {/* Route Field */}
+        <TextField
+          fullWidth
+          label="Route"
+          defaultValue={flightPlan.route}
+          {...register("route", { required: "Route is required" })}
+          error={!!errors.route}
+          helperText={errors.route ? String(errors.route.message) : ""}
+        />
 
-      <Box component={motion.div} initial="hidden" whileInView="visible" variants={fadeInUp}>
-        <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.6 }}>
-          {t("introParagraph1")}
-        </Typography>
-        <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.6 }}>
-          {t("introParagraph2")}
-        </Typography>
+        {/* Notes Field */}
+        <TextField
+          fullWidth
+          label="Notes"
+          defaultValue={flightPlan.notes}
+          {...register("notes")}
+          error={!!errors.notes}
+          helperText={errors.notes ? String(errors.notes.message) : ""}
+          multiline
+          rows={4}
+        />
 
-        <Typography variant="h5" sx={{ fontWeight: "bold", mt: 4, mb: 2 }}>
-          {t("harshRealityTitle")}
-        </Typography>
-        <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.6 }}>
-          {t("harshRealityText")}
-        </Typography>
-        <Box component="ul" sx={{ ml: 3, mb: 2 }}>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("harshRealityListItem1")}
-          </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("harshRealityListItem2")}
-          </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("harshRealityListItem3")}
-          </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("harshRealityListItem4")}
-          </Typography>
-          <Typography component="li" variant="body1">
-            {t("harshRealityListItem5")}
-          </Typography>
-        </Box>
-
-        <Typography variant="h5" sx={{ fontWeight: "bold", mt: 4, mb: 2 }}>
-          {t("benefitsTitle")}
-        </Typography>
-        <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.6 }}>
-          {t("benefitsIntro")}
-        </Typography>
-        <Box component="ul" sx={{ ml: 3, mb: 2 }}>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("benefitListItem1")}
-          </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("benefitListItem2")}
-          </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("benefitListItem3")}
-          </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("benefitListItem4")}
-          </Typography>
-          <Typography component="li" variant="body1">
-            {t("benefitListItem5")}
-          </Typography>
-        </Box>
-
-        <Typography variant="h5" sx={{ fontWeight: "bold", mt: 4, mb: 2 }}>
-          {t("packageTitle")}
-        </Typography>
-        <Box component="ul" sx={{ ml: 3, mb: 2 }}>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("packageListItem1")}
-          </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("packageListItem2")}
-          </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("packageListItem3")}
-          </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            {t("packageListItem4")}
-          </Typography>
-          <Typography component="li" variant="body1">
-            {t("packageListItem5")}
-          </Typography>
-        </Box>
-
-        <Typography variant="h5" sx={{ fontWeight: "bold", mt: 4, mb: 2 }}>
-          {t("finalCallTitle")}
-        </Typography>
-        <Typography variant="body1" sx={{ mb: 4, lineHeight: 1.6 }}>
-          {t("finalCallText")}
-        </Typography>
-
-        <NextLink href={`https://calendly.com/ekoforge`} passHref>
-          <motion.div whileHover={{ scale: 1.05 }}>
-            <Button
-              variant="contained"
-              size="large"
-              sx={{
-                px: 4,
-                py: 1.5,
-                background: `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
-                color: theme.palette.common.white,
-                fontWeight: "bold",
-                borderRadius: 50,
-                boxShadow: 3,
-                textTransform: "none",
-              }}
-            >
-              {t("bookNow")}
-            </Button>
-          </motion.div>
-        </NextLink>
+        {/* International Checkbox */}
+        <Controller
+          name="international"
+          control={control}
+          defaultValue={flightPlan.international ?? false}
+          render={({ field }) => (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={field.value}
+                  onChange={(e) => field.onChange(e.target.checked)}
+                />
+              }
+              label="International Flight"
+            />
+          )}
+        />
       </Box>
-    </Container>
+    </Edit>
   );
-};
-
-export default AboutBusinessPage;
+}

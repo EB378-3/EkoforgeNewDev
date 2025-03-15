@@ -39,7 +39,7 @@ import type { Viewport } from "next";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
-  : "https://mik.fi";
+  : "https://localhost:3000";
 
 const APP_NAME = "MIK";
 const APP_DEFAULT_TITLE = "MIK";

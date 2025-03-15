@@ -8,9 +8,21 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { formatISO, parseISO } from "date-fns";
 import { EventClickArg } from "@fullcalendar/core";
-import { Box, Typography, TextField, Button } from "@mui/material";
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  OutlinedInput,
+  Chip,
+} from "@mui/material";
 import { useGetIdentity, useList, HttpError } from "@refinedev/core";
 
+// Interfaces for bookings and resources.
 interface Booking {
   id: string;
   profile_id: string;
@@ -21,6 +33,11 @@ interface Booking {
   updated_at: string;
 }
 
+interface Resource {
+  id: string;
+  name: string;
+}
+
 export default function ResourceBookingCal() {
   const t = useTranslations("HomePage");
 
@@ -28,14 +45,24 @@ export default function ResourceBookingCal() {
   const { data: identity } = useGetIdentity<{ id: string }>();
   const currentUserId = identity?.id || "default-user";
 
-  // Fetch bookings for the current user.
+  // Fetch current user’s bookings.
   const { data, isLoading, isError } = useList<Booking, HttpError>({
     resource: "bookings",
     filters: [{ field: "profile_id", operator: "eq", value: currentUserId }],
     meta: { select: "*" },
   });
 
-  // Local state to hold bookings.
+  // Fetch resources.
+  const { data: resourcesData } = useList<Resource, HttpError>({
+    resource: "resources",
+    meta: { select: "*" },
+  });
+  const resources = resourcesData?.data || [];
+
+  // Multi-select state for resources (array of resource IDs).
+  const [selectedResources, setSelectedResources] = useState<string[]>([]);
+
+  // Local state to hold current user's bookings.
   const [bookings, setBookings] = useState<Booking[]>([]);
   useEffect(() => {
     if (data?.data) {
@@ -43,18 +70,40 @@ export default function ResourceBookingCal() {
     }
   }, [data]);
 
+  // Local state to hold bookings for the selected resources.
+  const [resourceBookings, setResourceBookings] = useState<Booking[]>([]);
+  const { data: resourceBookingsData } = useList<Booking, HttpError>({
+    resource: "bookings",
+    filters:
+      selectedResources && selectedResources.length > 0
+        ? [{ field: "resource_id", operator: "in", value: selectedResources }]
+        : [],
+    meta: { select: "*" },
+  });
+  useEffect(() => {
+    if (resourceBookingsData?.data) {
+      setResourceBookings(resourceBookingsData.data);
+    }
+  }, [resourceBookingsData]);
+
+  // State to track which calendar (user or resource) is active.
+  const [activeCalendar, setActiveCalendar] = useState<"user" | "resource">(
+    "user"
+  );
+
   // State for the selected booking and modal visibility.
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [localError, setLocalError] = useState("");
   const [isEditable, setIsEditable] = useState(false);
 
-  // When a date range is selected, prepare a new booking.
+  // When a date range is selected in the user's calendar.
   const handleDateSelect = (selection: { start: Date; end: Date }) => {
+    setActiveCalendar("user");
     setSelectedBooking({
-      id: "", // An empty id indicates a new booking.
+      id: "", // New booking
       profile_id: currentUserId,
-      resource_id: "default-resource", // Replace with an appropriate default if needed.
+      resource_id: "default-resource", // default for user calendar bookings
       start_time: formatISO(selection.start),
       end_time: formatISO(selection.end),
       created_at: "",
@@ -63,6 +112,23 @@ export default function ResourceBookingCal() {
     setModalOpen(true);
     setIsEditable(true);
   };
+
+  // Helper: When a date range is selected in a resource calendar.
+  const handleResourceDateSelectForResource =
+    (resourceId: string) => (selection: { start: Date; end: Date }) => {
+      setActiveCalendar("resource");
+      setSelectedBooking({
+        id: "",
+        profile_id: currentUserId,
+        resource_id: resourceId,
+        start_time: formatISO(selection.start),
+        end_time: formatISO(selection.end),
+        created_at: "",
+        updated_at: "",
+      });
+      setModalOpen(true);
+      setIsEditable(true);
+    };
 
   // Close the modal and reset state.
   const closeModal = () => {
@@ -77,23 +143,39 @@ export default function ResourceBookingCal() {
     if (!selectedBooking) return;
     if (selectedBooking.id === "") {
       // Create a new booking.
-      const newId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
+      const newId = crypto.randomUUID
+        ? crypto.randomUUID()
+        : Date.now().toString();
       const newBooking: Booking = {
         ...selectedBooking,
         id: newId,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
-      setBookings([...bookings, newBooking]);
+      if (activeCalendar === "user") {
+        setBookings([...bookings, newBooking]);
+      } else {
+        setResourceBookings([...resourceBookings, newBooking]);
+      }
     } else {
       // Update existing booking.
-      setBookings(
-        bookings.map((b) =>
-          b.id === selectedBooking.id
-            ? { ...selectedBooking, updated_at: new Date().toISOString() }
-            : b
-        )
-      );
+      if (activeCalendar === "user") {
+        setBookings(
+          bookings.map((b) =>
+            b.id === selectedBooking.id
+              ? { ...selectedBooking, updated_at: new Date().toISOString() }
+              : b
+          )
+        );
+      } else {
+        setResourceBookings(
+          resourceBookings.map((b) =>
+            b.id === selectedBooking.id
+              ? { ...selectedBooking, updated_at: new Date().toISOString() }
+              : b
+          )
+        );
+      }
     }
     closeModal();
   };
@@ -101,25 +183,36 @@ export default function ResourceBookingCal() {
   // Delete the selected booking.
   const handleDelete = () => {
     if (selectedBooking && selectedBooking.id !== "") {
-      setBookings(bookings.filter((b) => b.id !== selectedBooking.id));
+      if (activeCalendar === "user") {
+        setBookings(bookings.filter((b) => b.id !== selectedBooking.id));
+      } else {
+        setResourceBookings(
+          resourceBookings.filter((b) => b.id !== selectedBooking.id)
+        );
+      }
       closeModal();
     }
   };
 
-  // Map bookings to FullCalendar events.
-  const events = bookings.map((booking) => ({
+  // Map current user's bookings to FullCalendar events.
+  const userEvents = bookings.map((booking) => ({
     id: booking.id,
     title: "Booking",
-    start: booking.start_time ? parseISO(booking.start_time).toISOString() : undefined,
-    end: booking.end_time ? parseISO(booking.end_time).toISOString() : undefined,
+    start: booking.start_time
+      ? parseISO(booking.start_time).toISOString()
+      : undefined,
+    end: booking.end_time
+      ? parseISO(booking.end_time).toISOString()
+      : undefined,
     extendedProps: {
       profile_id: booking.profile_id,
       resource_id: booking.resource_id,
     },
   }));
 
-  // When an event is clicked, open the modal.
+  // When an event is clicked in the user's calendar.
   const handleEventClick = (info: EventClickArg) => {
+    setActiveCalendar("user");
     const bookingId = info.event.id;
     const booking = bookings.find((b) => b.id === bookingId);
     if (booking) {
@@ -129,66 +222,125 @@ export default function ResourceBookingCal() {
     }
   };
 
+  // When an event is clicked in a resource calendar.
+  const handleResourceEventClick = (info: EventClickArg) => {
+    setActiveCalendar("resource");
+    const bookingId = info.event.id;
+    const booking = resourceBookings.find((b) => b.id === bookingId);
+    if (booking) {
+      setSelectedBooking(booking);
+      setIsEditable(booking.profile_id === currentUserId);
+      setModalOpen(true);
+    }
+  };
+
   return (
     <>
-      {/* Mobile View */}
-      <Box
-        sx={{
-          display: { xs: "block", sm: "none" },
-          p: 2,
-          backgroundColor: "background.paper",
-          borderRadius: 1,
-        }}
-      >
-        <FullCalendar
-          timeZone="local"
-          nowIndicator
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-          initialView="timeGridDay"
-          headerToolbar={{
-            left: "",
-            center: "title prev,next today",
-            right: "",
-          }}
-          editable
-          selectable
-          scrollTime={new Date().toLocaleTimeString("it-IT")}
-          eventClick={handleEventClick}
-          select={handleDateSelect}
-          events={events}
-          height="auto"
-        />
+      {/* Multi-select Resource Dropdown */}
+      <Box sx={{ mx: 2, my: 2 }}>
+        <FormControl fullWidth variant="outlined">
+          <InputLabel id="resource-multiselect-label">
+            Select Resources
+          </InputLabel>
+          <Select
+            labelId="resource-multiselect-label"
+            multiple
+            value={selectedResources}
+            onChange={(e) =>
+              setSelectedResources(
+                typeof e.target.value === "string"
+                  ? e.target.value.split(",")
+                  : e.target.value
+              )
+            }
+            input={<OutlinedInput label="Select Resources" />}
+            renderValue={(selected) => (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                {(selected as string[]).map((value) => {
+                  const resource = resources.find(
+                    (r: Resource) => r.id === value
+                  );
+                  return (
+                    <Chip key={value} label={resource ? resource.name : value} />
+                  );
+                })}
+              </Box>
+            )}
+          >
+            {resources.map((resource: Resource) => (
+              <MenuItem key={resource.id} value={resource.id}>
+                {resource.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Box>
 
-      {/* Desktop View */}
-      <Box
-        sx={{
-          display: { xs: "none", sm: "block" },
-          mx: 2,
-          p: 2,
-          backgroundColor: "background.paper",
-          borderRadius: 1,
-          color: "text.primary",
-        }}
-      >
-        <FullCalendar
-          timeZone="local"
-          nowIndicator
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-          initialView="dayGridMonth"
-          headerToolbar={{
-            left: "title",
-            center: "dayGridMonth,timeGridWeek,timeGridDay",
-            right: "prev,next today",
+
+      {/* Responsive Individual Calendars for Each Selected Resource */}
+      {selectedResources && selectedResources.length > 0 && (
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
+            mx: 2,
+            my: 4,
+            justifyContent: "center",
           }}
-          editable
-          selectable
-          eventClick={handleEventClick}
-          select={handleDateSelect}
-          events={events}
-          height="auto"
-        />
-      </Box>
+        >
+          {selectedResources.map((resourceId) => {
+            const resource = resources.find((r: Resource) => r.id === resourceId);
+            // Filter bookings for the current resource.
+            const events = resourceBookings
+              .filter((booking) => booking.resource_id === resourceId)
+              .map((booking) => ({
+                id: booking.id,
+                title: "Booking",
+                start: booking.start_time
+                  ? parseISO(booking.start_time).toISOString()
+                  : undefined,
+                end: booking.end_time
+                  ? parseISO(booking.end_time).toISOString()
+                  : undefined,
+                extendedProps: {
+                  profile_id: booking.profile_id,
+                  resource_id: booking.resource_id,
+                },
+              }));
+
+            return (
+              <Box
+                key={resourceId}
+                sx={{
+                  flex: "1 1 300px",
+                  maxWidth: { xs: "100%", sm: "calc(50% - 16px)", md: "calc(33% - 16px)" },
+                  backgroundColor: "background.paper",
+                  borderRadius: 1,
+                  p: 2,
+                  color: "text.primary",
+                }}
+              >
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                  Calendar for Resource: {resource?.name || resourceId}
+                </Typography>
+                <FullCalendar
+                  timeZone="local"
+                  nowIndicator
+                  plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                  initialView="timeGridDay"
+                  selectable
+                  // Use our helper to create a booking for this resource.
+                  select={handleResourceDateSelectForResource(resourceId)}
+                  eventClick={handleResourceEventClick}
+                  events={events}
+                  height="auto"
+                />
+              </Box>
+            );
+          })}
+        </Box>
+      )}
 
       {/* Modal for creating/editing/viewing a booking */}
       {modalOpen && selectedBooking && (
@@ -258,7 +410,12 @@ export default function ResourceBookingCal() {
                 sx={{ mb: 2 }}
               />
               {localError && (
-                <Typography variant="body2" color="error" align="center" sx={{ mb: 2 }}>
+                <Typography
+                  variant="body2"
+                  color="error"
+                  align="center"
+                  sx={{ mb: 2 }}
+                >
                   Error: {localError}
                 </Typography>
               )}
@@ -330,7 +487,11 @@ export default function ResourceBookingCal() {
                 <Button variant="contained" onClick={handleSave}>
                   Save
                 </Button>
-                <Button variant="contained" color="error" onClick={handleDelete}>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleDelete}
+                >
                   Delete
                 </Button>
                 <Button variant="outlined" onClick={closeModal}>
@@ -388,7 +549,11 @@ export default function ResourceBookingCal() {
                   <Typography variant="body2" color="text.secondary">
                     You do not have permission to edit this booking.
                   </Typography>
-                  <Button variant="outlined" onClick={closeModal} sx={{ mt: 1 }}>
+                  <Button
+                    variant="outlined"
+                    onClick={closeModal}
+                    sx={{ mt: 1 }}
+                  >
                     Cancel
                   </Button>
                 </Box>
