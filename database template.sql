@@ -352,6 +352,9 @@ CREATE TABLE IF NOT EXISTS public.bookings (
     end_time TIMESTAMP with time zone NOT NULL,
     created_at TIMESTAMP with time zone NOT NULL DEFAULT now(),
     updated_at TIMESTAMP with time zone NOT NULL DEFAULT now(),
+    title text null,
+    notes text null,
+    flight_type jsonb not null,
     CONSTRAINT fk_booking_profile FOREIGN KEY (profile_id)
         REFERENCES public.profiles(id)
         ON DELETE CASCADE

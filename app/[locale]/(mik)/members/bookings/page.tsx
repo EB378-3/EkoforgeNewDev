@@ -27,15 +27,23 @@ import {
   useUpdate,
   useDelete,
   HttpError,
+  useShow,
 } from "@refinedev/core";
 
-// Interfaces for bookings and resources.
+// --------------------
+// Interfaces
+// --------------------
+
 interface Booking {
-  id?: string; // Marked optional for new records.
+  id?: string; // Optional for new records.
   profile_id: string;
   resource_id: string;
   start_time: string;
   end_time: string;
+  title?: string;
+  notes?: string;
+  instructor_id?: string;
+  flight_type?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -45,7 +53,50 @@ interface Resource {
   name: string;
 }
 
-// Helper: format date strings for a datetime-local input.
+export interface Instructor {
+  id: string;
+  name: string;
+}
+
+// Dummy flight type options.
+const flightTypeOptions = Array.from(
+  new Set(["Private", "Commercial", "Cargo", "Training"])
+);
+
+// --------------------
+// Helper Components
+// --------------------
+
+function ProfileName({ profileId }: { profileId: string }) {
+  const { queryResult } = useShow({
+    resource: "profiles",
+    id: profileId,
+    meta: { select: "first_name,last_name" },
+    queryOptions: { enabled: !!profileId },
+  });
+  const profileData = queryResult?.data?.data as
+    | { first_name: string; last_name: string }
+    | undefined;
+  if (!profileData) return <span>Loading...</span>;
+  return (
+    <span>
+      {profileData.first_name} {profileData.last_name}
+    </span>
+  );
+}
+
+function InstructorName({ instructorId }: { instructorId: string }) {
+  const { queryResult } = useShow({
+    resource: "instructors",
+    id: instructorId,
+    meta: { select: "profile_id" },
+    queryOptions: { enabled: !!instructorId },
+  });
+  const data = queryResult?.data?.data as { profile_id: string } | undefined;
+  if (!data) return <span>Loading...</span>;
+  return <ProfileName profileId={data.profile_id} />;
+}
+
 const formatDateForInput = (dateStr: string) => {
   try {
     return format(parseISO(dateStr), "yyyy-MM-dd'T'HH:mm");
@@ -54,10 +105,15 @@ const formatDateForInput = (dateStr: string) => {
   }
 };
 
+// --------------------
+// Booking Modal Component
+// --------------------
+
 interface BookingModalProps {
   open: boolean;
   booking: Booking | null;
   isEditable: boolean;
+  instructors: Instructor[];
   onClose: () => void;
   onSave: (booking: Booking) => void;
   onDelete: (bookingId: string) => void;
@@ -67,6 +123,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
   open,
   booking,
   isEditable,
+  instructors,
   onClose,
   onSave,
   onDelete,
@@ -137,6 +194,68 @@ const BookingModal: React.FC<BookingModalProps> = ({
           sx={{ mb: 2 }}
           disabled={!isEditable}
         />
+
+        {/* Additional Details Section */}
+        <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>
+          Additional Details
+        </Typography>
+        <TextField
+          fullWidth
+          label="Title"
+          value={localBooking.title || ""}
+          onChange={(e) => handleChange("title", e.target.value)}
+          sx={{ mb: 2 }}
+          disabled={!isEditable}
+        />
+        <TextField
+          fullWidth
+          label="Notes"
+          value={localBooking.notes || ""}
+          onChange={(e) => handleChange("notes", e.target.value)}
+          sx={{ mb: 2 }}
+          multiline
+          rows={3}
+          disabled={!isEditable}
+        />
+        <FormControl fullWidth sx={{ mb: 2 }} disabled={!isEditable}>
+          <InputLabel id="instructor-label">Instructor</InputLabel>
+          <Select
+            labelId="instructor-label"
+            value={localBooking.instructor_id || ""}
+            label="Instructor"
+            onChange={(e) =>
+              handleChange("instructor_id", e.target.value as string)
+            }
+          >
+            {instructors.length > 0 ? (
+              instructors.map((instr) => (
+                <MenuItem key={instr.id} value={instr.id}>
+                  <InstructorName instructorId={instr.id} />
+                </MenuItem>
+              ))
+            ) : (
+              <MenuItem value="">Loading instructors...</MenuItem>
+            )}
+          </Select>
+        </FormControl>
+        <FormControl fullWidth sx={{ mb: 2 }} disabled={!isEditable}>
+          <InputLabel id="flight-type-label">Flight Type</InputLabel>
+          <Select
+            labelId="flight-type-label"
+            value={localBooking.flight_type || ""}
+            label="Flight Type"
+            onChange={(e) =>
+              handleChange("flight_type", e.target.value as string)
+            }
+          >
+            {flightTypeOptions.map((ft) => (
+              <MenuItem key={ft} value={ft}>
+                {ft}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
         {error && (
           <Typography variant="body2" color="error" align="center" sx={{ mb: 2 }}>
             Error: {error}
@@ -168,14 +287,22 @@ const BookingModal: React.FC<BookingModalProps> = ({
   );
 };
 
+// --------------------
+// Main Calendar Component
+// --------------------
+
 export default function ResourceBookingCal() {
   const t = useTranslations("HomePage");
 
-  // Get current user identity.
   const { data: identity } = useGetIdentity<{ id: string }>();
   const currentUserId = identity?.id || "default-user";
 
-  // Fetch all bookings.
+  const { data: instructorData } = useList<Instructor>({
+    resource: "instructors",
+    meta: { select: "*" },
+  });
+  const instructors = instructorData?.data || [];
+
   const {
     data: bookingsData,
     isLoading: isBookingsLoading,
@@ -187,27 +314,34 @@ export default function ResourceBookingCal() {
   });
   const allBookings = bookingsData?.data || [];
 
-  // Fetch all resources.
   const { data: resourcesData } = useList<Resource, HttpError>({
     resource: "resources",
     meta: { select: "*" },
   });
   const resources = resourcesData?.data || [];
 
-  // Refine mutations for CRUD operations.
   const { mutate: createBookingMutate } = useCreate<Booking, HttpError>();
   const { mutate: updateBookingMutate } = useUpdate<Booking, HttpError>();
   const { mutate: deleteBookingMutate } = useDelete<Booking, HttpError>();
 
-  // State for resource filtering.
   const [selectedResources, setSelectedResources] = useState<string[]>([]);
-
-  // Modal state.
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [isEditable, setIsEditable] = useState(false);
 
-  // When a user clicks on an event.
+  const isBookingOverlapping = (newBooking: Booking): boolean => {
+    const newStart = new Date(newBooking.start_time);
+    const newEnd = new Date(newBooking.end_time);
+    return allBookings.some((existingBooking) => {
+      if (existingBooking.resource_id !== newBooking.resource_id) return false;
+      if (existingBooking.id && existingBooking.id === newBooking.id)
+        return false;
+      const existingStart = new Date(existingBooking.start_time);
+      const existingEnd = new Date(existingBooking.end_time);
+      return newStart < existingEnd && newEnd > existingStart;
+    });
+  };
+
   const handleEventClick = (info: any) => {
     const bookingId = info.event.id;
     const booking = allBookings.find((b) => b.id === bookingId);
@@ -218,7 +352,6 @@ export default function ResourceBookingCal() {
     }
   };
 
-  // When a date range is selected in a resource calendar.
   const handleResourceDateSelect =
     (resourceId: string) => (selection: { start: Date; end: Date }) => {
       const newBooking: Booking = {
@@ -239,10 +372,15 @@ export default function ResourceBookingCal() {
     setSelectedBooking(null);
   };
 
-  // Save booking: if no id, omit the id field so the backend can auto-generate it.
   const handleSaveBooking = (booking: Booking) => {
+    if (isBookingOverlapping(booking)) {
+      alert(
+        "Booking times overlap with an existing booking. Please choose a different time."
+      );
+      return;
+    }
     if (!booking.id) {
-      const { id, ...bookingData } = booking; // Remove id before creation.
+      const { id, ...bookingData } = booking;
       createBookingMutate(
         {
           resource: "bookings",
@@ -278,7 +416,6 @@ export default function ResourceBookingCal() {
     }
   };
 
-  // Delete a booking.
   const handleDeleteBooking = (bookingId: string) => {
     deleteBookingMutate(
       {
@@ -297,7 +434,6 @@ export default function ResourceBookingCal() {
     );
   };
 
-  // Compute events for the current user's bookings.
   const userEvents = allBookings
     .filter((booking) => booking.profile_id === currentUserId)
     .map((booking) => ({
@@ -313,7 +449,6 @@ export default function ResourceBookingCal() {
 
   return (
     <Box sx={{ p: 2 }}>
-      {/* Multi-select for resources */}
       <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
         <InputLabel id="resource-multiselect-label">
           Select Resources
@@ -352,22 +487,6 @@ export default function ResourceBookingCal() {
         </Select>
       </FormControl>
 
-      {/* User's personal booking calendar */}
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        My Bookings
-      </Typography>
-      <FullCalendar
-        timeZone="local"
-        nowIndicator
-        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-        initialView="timeGridDay"
-        selectable
-        eventClick={handleEventClick}
-        events={userEvents}
-        height="auto"
-      />
-
-      {/* Calendars for each selected resource */}
       {selectedResources.length > 0 && (
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mt: 4 }}>
           {selectedResources.map((resourceId) => {
@@ -400,6 +519,9 @@ export default function ResourceBookingCal() {
                 <FullCalendar
                   timeZone="local"
                   nowIndicator
+                  footerToolbar={{
+                    right: "timeGridDay timeGridWeek dayGridMonth",
+                  }}
                   plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                   initialView="timeGridDay"
                   selectable
@@ -414,11 +536,11 @@ export default function ResourceBookingCal() {
         </Box>
       )}
 
-      {/* Booking modal for create/edit/view */}
       <BookingModal
         open={modalOpen}
         booking={selectedBooking}
         isEditable={isEditable}
+        instructors={instructors}
         onClose={closeModal}
         onSave={handleSaveBooking}
         onDelete={handleDeleteBooking}
