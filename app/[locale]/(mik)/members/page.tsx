@@ -6,11 +6,7 @@ import {
   useTable,
   useList,
   useGetIdentity,
-  useOne,
-  useCreate,
-  useUpdate,
-  useDelete,
-  HttpError,
+  useOne
 } from "@refinedev/core";
 import {
   Box,
@@ -129,14 +125,15 @@ export default function FrontPage() {
   const blogs = tableQueryResult?.data?.data ?? [];
 
   // MY BOOKINGS SECTION
-  const { data: identity } = useGetIdentity<{ id: string }>();
-  const currentUserId = identity?.id || "default-user";
+  const { data: identityData } = useGetIdentity<{ id: string }>();
+  const currentUserId = identityData?.id;
+
   const { data: bookingsData } = useList<Booking>({
     resource: "bookings",
+    filters: currentUserId ? [{ field: "profile_id", operator: "eq", value: currentUserId }] : [],
     meta: { select: "*" },
   });
-  const allBookings = bookingsData?.data ?? [];
-  const myBookings = allBookings.filter((b) => b.profile_id === currentUserId);
+  const myBookings = bookingsData?.data ?? [];
 
   // LOGBOOK CHART SECTION
   const { data: logbookData } = useList<LogBookEntry>({
@@ -153,18 +150,6 @@ export default function FrontPage() {
       monthlyData[entryDate.getMonth()].flightHours += entry.flightHours;
     }
   });
-
-  // RESOURCE FILTER (for calendar event filtering)
-  const { data: resourcesData } = useList<Resource>({
-    resource: "resources",
-    meta: { select: "*" },
-  });
-  const resources = resourcesData?.data ?? [];
-  const [selectedResourceIds, setSelectedResourceIds] = useState<string[]>([]);
-  const filteredBookings =
-    selectedResourceIds.length > 0
-      ? allBookings.filter((b) => selectedResourceIds.includes(b.resource_id))
-      : allBookings;
 
   return (
     <Box sx={{ p: 4 }}>

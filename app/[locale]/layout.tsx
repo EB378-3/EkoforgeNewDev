@@ -156,7 +156,7 @@ export default async function RootLayout({
                           name: "profiles",
                           identifier: "members",
                           meta: {
-                            icon: <AirplanemodeActiveIcon />,
+                            
                             label: "Members",
                           },
                         },
