@@ -121,7 +121,8 @@ export default async function RootLayout({
                       notificationProvider={useNotificationProvider}
                       resources={[
                         {
-                          name: "blogs",
+                          name: "home",
+                          identifier: "home_public",
                           list: `/${locale}/home`,
                           meta: {
                             icon: <BroadcastOnHomeIcon />,
@@ -130,6 +131,7 @@ export default async function RootLayout({
                         },
                         {
                           name: "flight school",
+                          identifier: "flight_school_public",
                           list: `/${locale}/flight_school`,
                           meta: {
                             label: "Flight School",
@@ -138,6 +140,7 @@ export default async function RootLayout({
                         },
                         {
                           name: "aviation club",
+                          identifier: "aviation_club_public",
                           list: `/${locale}/club`,
                           meta: {
                             label: "Aviation Club",
@@ -146,6 +149,7 @@ export default async function RootLayout({
                         },
                         {
                           name: "resources",
+                          identifier: "resources_public",
                           list: `/${locale}/aircraft`,
                           meta: {
                             label: "Aircraft and simulators",
@@ -161,17 +165,22 @@ export default async function RootLayout({
                           },
                         },
                         {
-                          name: "profiles",
+                          name: "blogs",
                           identifier: "dashboard",
                           list: `/${locale}/members`,
+                          show: `/${locale}/members/blogs/show/:id`,
+                          edit: `/${locale}/members/blogs/edit/:id`,
+                          create: `/${locale}/members/blogs/create`,
                           meta: {
                             icon: <BroadcastOnHomeIcon />,
                             label: "Dashboard",
                             parent: "members",
+                            canDelete: true,
                           },
                         },
                         {
                           name: "notices",
+                          identifier: "saftey_notice",
                           list: `/${locale}/members/saftey_notice`,
                           create: `/${locale}/members/saftey_notice/create`,
                           edit: `/${locale}/members/saftey_notice/edit/:id`,

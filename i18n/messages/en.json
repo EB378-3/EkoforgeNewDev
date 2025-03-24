@@ -107,5 +107,119 @@
     "ourApproachText": "We partner closely with our clients, taking the time to understand their unique needs. By crafting bespoke solutions, we ensure lasting impact and measurable success.",
     "contactTitle": "Contact Us",
     "contactSubtitle": "We'd love to hear from you! Reach out and let’s start a conversation."    
-  }
+  },
+
+
+  "FlightPlanList": {
+    "flightPlanning": "Flight Planning",
+    "aircraftReservation": {
+      "title": "Aircraft Reservation",
+      "description": "View and reserve your desired aircraft.",
+      "buttonText": "View Reservations"
+    },
+    "aviationWeather": {
+      "title": "Aviation Weather",
+      "description": "Check the latest aviation weather and route notices.",
+      "buttonText": "Ilmailusää"
+    },
+    "flightLogbook": {
+      "title": "Flight Logbook",
+      "description": "View and manage your flight logbook.",
+      "buttonText": "View Logbook"
+    },
+    "maintenance": {
+      "title": "Maintenance Schedule & Hours",
+      "description": "View maintenance schedules and aircraft hour details.",
+      "buttonText": "View Hours"
+    },
+    "flightPlan": {
+      "title": "Flight Plan",
+      "description": "The written Flight Plan (FPL) is submitted online via the ANS Finland website. Remember to confirm your plan by calling the Helsinki-Vantaa briefing. Click the link below to pre-fill the FPL form with the basic details of the club's aircraft.",
+      "buttonText": "File Flight Plan Here"
+    },
+    "flightPlans": "My Flight Plans",
+    "dataGrid": {
+      "route": "Route",
+      "notes": "Notes",
+      "actions": "Actions"
+    },
+    "error": {
+      "fetchFlightPlans": "An error occurred while fetching flight plans."
+    },
+    "GeneralResources": "General Resources",
+    "GeneralResourcesDescription": "Access general resources for flight planning and aviation weather.",
+    "ais": "AIS - Online AIP",
+    "ilmailusaa": "Ilmailusää - Weather Information",
+    "FLYK": "FLYK - Flight Maps",
+    "lentopaikat": "Lentopaikat - Charts, etc",
+    "GeneralResourcesDescriptionTwo": "Equipment instruction documents, etc.",
+    "GeneralResourcesDescriptionTwoText": "Here you will find equipment instruction documents, etc.",
+    "instructions": "Equipment Instructions/Documents",
+    "GeneralResourcesDescriptionThree": "Fleet-specific information lists",
+    "GeneralResourcesDescriptionThreeText": "Here you will find fleet-specific information lists.",
+    "ihqInfo": "OH-IHQ, DV20",
+    "stlInfo": "OH-STL, DA40",
+    "GeneralResourcesDescriptionFour":  "International flight planning resources",
+    "GeneralResourcesDescriptionFourText": "Here you will find international flight planning resources.",
+    "internationalFlightPlanning": "International Flight Planning"
+  },
+  "InternationalFlightPlanning":{
+    "title": "International Flight Planning",
+    "section1": {
+      "title": "International Flight Planning Considerations",
+      "content": "When flying internationally, consider possible landing and navigation fees as the Finnish seasonal pass system does not cover expenses abroad. These costs are usually paid by credit card or cash at the destination briefing. Airport staff are friendly and can assist if needed. Fueling abroad is charged against the club's hourly rate – however, credit cards tucked away in aircraft manuals might not be ideal. It's advisable to carry cash as a precaution and retain the fuel receipt – you can get reimbursed for the fuel invoice upon returning home by submitting a free-form application in the flight preparation area with your bank account number attached with the fuel receipt."
+    },
+    "section2": {
+      "title": "Written Flight Plan",
+      "content": "Always remember to file a written flight plan for international flights. The plan must be submitted at least one hour before crossing the national border. Since the Schengen Agreement covers most neighboring countries, this is usually the only formality required for border crossing.",
+      "linkText": "Learn more about flight planning",
+      "linkUrl": "https://example.com/flight-plan"
+    },
+    "section3": {
+      "title": "Water Area Crossings",
+      "content": "Each seat in the club's aircraft is equipped with life vests containing CO2 cartridges (commonly known as 'pop vests') that must be used when crossing water areas. Regulations require them for crossings of water bodies longer than 50 nautical miles, but it is advisable to wear them whenever flying a considerable distance away from shore.",
+      "linkText": "More on safety equipment",
+      "linkUrl": "https://example.com/water-crossings"
+    },
+    "section4": {
+      "title": "Estonia",
+      "content": "Estonia is part of the EU and the Schengen Area, so customs and passport formalities are not a concern. You can begin your flight from any airport in Finland and land at any airport in Estonia. Estonia, especially from the perspective of Malmi, is an excellent travel destination – even a short flight offers plenty to see. Tallinn has higher landing fees compared to, for example, airports in Saaremaa.",
+      "linkText": "Explore Estonia",
+      "linkUrl": "https://example.com/estonia"
+    },
+    "section5": {
+      "title": "Sweden",
+      "content": "Sweden is also part of the EU and the Schengen Area, so the procedure is the same as for Estonia. If you plan to fly to several airports in Sweden, it might be worthwhile to purchase a local 'weekly pass' that covers landing fees at most airports at a reasonable bulk price for a week. The Swedish Transport Agency's flight planning website provides weather, Sweden's AIP, and NOTAMs for our western neighbor.",
+      "linkText": "Discover Sweden",
+      "linkUrl": "https://example.com/sweden"
+    },
+    "section6": {
+      "title": "Latvia",
+      "content": "Riga is a popular destination – a vibrant European city just a couple of hours away by flight, and a common stopover for many summer vacation flights. In addition to Riga International Airport, there is also the older Riga airport, Spilve, located closer to the city. Fuel was not available from Spilve during the summer of 2012, although landing fees were only around ten euros. The airfield is PPR! Unfortunately, Latvia poses challenges regarding 100LL fuel (practically only from Riga), but diesel-powered aircraft face no issues. As Latvia is part of Schengen, a written plan alone is sufficient.",
+      "linkText": "Learn about Latvia",
+      "linkUrl": "https://example.com/latvia"
+    },
+    "section7": {
+      "title": "Lithuania",
+      "content": "In Lithuania, air traffic control also provides information about other aircraft outside of controlled airspace. The fees are reasonable and generally lower than in Latvia. The availability of 100LL fuel is slightly better, but still requires planning. Popular destinations include Palanga, known for its sandy beaches, Klaipeda – from which a short flight takes you to Kuurinkynnes, and Kaunas, where there is fueling availability along with an AFIS-like service at the general aviation field S. Darius and S. Girėnas (Aleksotas).",
+      "linkText": "Visit Lithuania",
+      "linkUrl": "https://example.com/lithuania"
+    },
+    "section8": {
+      "title": "Eurocontrol AIP Service",
+      "content": "Eurocontrol, the cooperative organization responsible for European airspace, offers a service that provides the aviation manuals (AIP) of member states in PDF format. This service requires free registration. Additionally, Eurocontrol's website offers a list of direct links to the individual AIP services of the member states.",
+      "linkText": "Access Eurocontrol",
+      "linkUrl": "https://example.com/eurocontrol"
+    },
+    "internationalFlightPlans": "International Flight Plans",
+    "dataGrid": {
+      "id": "ID",
+      "route": "Route",
+      "notes": "Notes",
+      "actions": "Actions"
+    },
+    "error": {
+      "fetchInternationalFlightPlans": "An error occurred while fetching international flight plans."
+    }
+  }  
 }

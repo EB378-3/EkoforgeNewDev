@@ -1,6 +1,7 @@
 -- ===============================================================
--- 1. Create the Profiles Table (without policies yet)
+-- 1. Create the Profiles Table (with aggregated_stats column)
 -- ===============================================================
+DROP TABLE IF EXISTS public.profiles CASCADE;
 CREATE TABLE public.profiles (
   id uuid NOT NULL,
   first_name text NOT NULL,
@@ -8,8 +9,9 @@ CREATE TABLE public.profiles (
   email text NOT NULL UNIQUE,
   phone_number text,
   avatar_url text,
-  ratings jsonb NOT NULL DEFAULT '[]'::jsonb,      
-  flight_hours jsonb NOT NULL DEFAULT '[]'::jsonb,   -- e.g. {"resources": "120:30"}
+  ratings jsonb NOT NULL DEFAULT '[]'::jsonb,
+  flight_hours jsonb NOT NULL DEFAULT '[]'::jsonb,
+  aggregated_stats jsonb NOT NULL DEFAULT '{}'::jsonb,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT profiles_pkey PRIMARY KEY (id),
@@ -20,6 +22,7 @@ CREATE TABLE public.profiles (
 -- ===============================================================
 -- 2. Create the Admins Table with a foreign key to Profiles
 -- ===============================================================
+DROP TABLE IF EXISTS public.admins CASCADE;
 CREATE TABLE public.admins (
   id uuid PRIMARY KEY,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
@@ -27,7 +30,6 @@ CREATE TABLE public.admins (
       REFERENCES public.profiles(id)
       ON DELETE CASCADE
 );
-
 ALTER TABLE public.admins ENABLE ROW LEVEL SECURITY;
 
 -- ===============================================================
@@ -58,7 +60,6 @@ CREATE POLICY profiles_rls ON public.profiles
     id = auth.uid()
   );
 
--- Allow all users to SELECT profiles.
 CREATE POLICY profiles_select_rls ON public.profiles
   FOR SELECT
   USING (true);
@@ -66,13 +67,14 @@ CREATE POLICY profiles_select_rls ON public.profiles
 -- ===============================================================
 -- 5. Create the Notices Table and its RLS Policies
 -- ===============================================================
-CREATE TABLE IF NOT EXISTS public.notices (
+DROP TABLE IF EXISTS public.notices CASCADE;
+CREATE TABLE public.notices (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     title VARCHAR(255) NOT NULL,
     message TEXT NOT NULL,
     time_off_incident TIMESTAMP with time zone,  -- When the time off incident occurred
-    submitted_by uuid NOT NULL default auth.uid (),                    -- Profile/User who submitted the notice
-    extra_parameters JSONB DEFAULT NULL,           -- Additional parameters stored as JSON
+    submitted_by uuid NOT NULL DEFAULT auth.uid(),
+    extra_parameters JSONB DEFAULT NULL,
     created_at TIMESTAMP with time zone NOT NULL DEFAULT now(),
     updated_at TIMESTAMP with time zone NOT NULL DEFAULT now(),
     CONSTRAINT fk_notices_submitted_by FOREIGN KEY (submitted_by)
@@ -80,7 +82,6 @@ CREATE TABLE IF NOT EXISTS public.notices (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
-
 ALTER TABLE public.notices ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY notices_rls ON public.notices
@@ -97,10 +98,11 @@ CREATE POLICY notices_rls ON public.notices
 -- ===============================================================
 -- 6. Create the Instructors Table and its RLS Policies
 -- ===============================================================
-CREATE TABLE IF NOT EXISTS public.instructors (
+DROP TABLE IF EXISTS public.instructors CASCADE;
+CREATE TABLE public.instructors (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     profile_id uuid NOT NULL,
-    rating_level VARCHAR(50),      -- e.g., "CFI", "CFII", etc.
+    rating_level VARCHAR(50),
     availability TEXT,
     created_at TIMESTAMP with time zone NOT NULL DEFAULT now(),
     updated_at TIMESTAMP with time zone NOT NULL DEFAULT now(),
@@ -109,7 +111,6 @@ CREATE TABLE IF NOT EXISTS public.instructors (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
-
 ALTER TABLE public.instructors ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY instructors_rls ON public.instructors
@@ -123,7 +124,6 @@ CREATE POLICY instructors_rls ON public.instructors
     profile_id = auth.uid()
   );
 
--- Allow all users to SELECT instructors.
 CREATE POLICY instructors_select_rls ON public.instructors
   FOR SELECT
   USING (true);
@@ -131,27 +131,25 @@ CREATE POLICY instructors_select_rls ON public.instructors
 -- ===============================================================
 -- 7. Create the Resources Table and its RLS Policies
 -- ===============================================================
-CREATE TABLE IF NOT EXISTS public.resources (
+DROP TABLE IF EXISTS public.resources CASCADE;
+CREATE TABLE public.resources (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     resource_type VARCHAR(50) NOT NULL CHECK (resource_type IN ('aircraft','simulator','classroom')),
     name VARCHAR(255) NOT NULL,
     status VARCHAR(50) NOT NULL DEFAULT 'available' CHECK (status IN ('available','maintenance','INOP')),
-    total_hours NUMERIC(5,2) NOT NULL DEFAULT 0.0,  -- Aggregated flight hours from logbook.
+    total_hours NUMERIC(5,2) NOT NULL DEFAULT 0.0,
     hourly_rate NUMERIC(5,2) NOT NULL DEFAULT 0.0,
     last_service NUMERIC(5,2) DEFAULT 0.0,
     next_service NUMERIC(5,2) DEFAULT 0.0,
     created_at TIMESTAMP with time zone NOT NULL DEFAULT now(),
     updated_at TIMESTAMP with time zone NOT NULL DEFAULT now()
 );
-
 ALTER TABLE public.resources ENABLE ROW LEVEL SECURITY;
 
--- Allow all users to read resources.
 CREATE POLICY resources_select_rls ON public.resources
   FOR SELECT
   USING (true);
 
--- Restrict modifications to admins only.
 CREATE POLICY resources_write_rls ON public.resources
   FOR ALL
   USING (public.is_admin())
@@ -160,76 +158,37 @@ CREATE POLICY resources_write_rls ON public.resources
 -- ===============================================================
 -- 8. Create the Logbook Table and its RLS Policies
 -- ===============================================================
+DROP TABLE IF EXISTS public.logbook CASCADE;
 CREATE TABLE public.logbook (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  profile_id uuid NOT NULL default auth.uid (),
+  profile_id uuid NOT NULL DEFAULT auth.uid(),
   resource_id uuid NOT NULL,
-  
-  -- Original columns
-  flight_date DATE NOT NULL,            -- Date of flight
-  flight_time NUMERIC(5,2) NOT NULL,      -- Total flight time (e.g. air time)
-  notes TEXT NULL,
-  
-  -- New time-related columns
-  block_off_time TIME WITHOUT TIME ZONE NOT NULL,  -- Time aircraft leaves the ramp
-  takeoff_time TIME WITHOUT TIME ZONE NOT NULL,    -- Time wheels leave the ground
-  landing_time TIME WITHOUT TIME ZONE NOT NULL,    -- Time wheels touch the ground
-  block_on_time TIME WITHOUT TIME ZONE NOT NULL,   -- Time aircraft is parked after flight
-  block_time NUMERIC(5,2) NOT NULL,       -- Total block time in hours
-  
-  -- Additional fields
-  landings INT NOT NULL,                           -- Number of landings
-  flight_details JSONB NOT NULL DEFAULT '{}',     -- JSON for night flight, IFR time, etc.
-  fuel_left NUMERIC(5,2) NULL,                     -- Remaining fuel in gallons/liters
-  billing_info TEXT NULL,                          -- Billing information or reference
-  pax INT NOT NULL,                                -- Number of passengers
-  departure_place TEXT NOT NULL,                   -- Departure airport or location
-  arrival_place TEXT NOT NULL,                     -- Arrival airport or location
-  flight_type TEXT NOT NULL,                       -- Type of flight (e.g. 'VFR', 'IFR', 'Training')
-  
-  -- References to profiles for PIC and Student (if applicable)
+  flight_date DATE NOT NULL,
+  flight_time NUMERIC(5,2) NOT NULL,      -- Total flight time (in hours)
+  notes TEXT,
+  block_off_time TIME WITHOUT TIME ZONE NOT NULL,
+  takeoff_time TIME WITHOUT TIME ZONE NOT NULL,
+  landing_time TIME WITHOUT TIME ZONE NOT NULL,
+  block_on_time TIME WITHOUT TIME ZONE NOT NULL,
+  block_time NUMERIC(5,2) NOT NULL,       -- Total block time (in hours)
+  landings INT NOT NULL,
+  flight_details JSONB NOT NULL DEFAULT '{}',
+  fuel_left NUMERIC(5,2),
+  billing_info TEXT,
+  pax INT NOT NULL,
+  departure_place TEXT NOT NULL,
+  arrival_place TEXT NOT NULL,
+  flight_type TEXT NOT NULL,
   pic_id uuid NOT NULL,
-  student_id uuid NULL,
-  
-  -- Timestamps
+  student_id uuid,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-  
-  -- Primary Key
   CONSTRAINT logbook_pkey PRIMARY KEY (id),
-  
-  -- Foreign Keys
-  CONSTRAINT fk_logbook_profile FOREIGN KEY (profile_id) REFERENCES public.profiles (id)
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT fk_logbook_resource FOREIGN KEY (resource_id) REFERENCES public.resources (id)
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT fk_logbook_pic FOREIGN KEY (pic_id) REFERENCES public.profiles (id)
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT fk_logbook_student FOREIGN KEY (student_id) REFERENCES public.profiles (id)
-      ON UPDATE CASCADE ON DELETE CASCADE
-)
-TABLESPACE pg_default;
-
--- ===============================================================
--- 8.1 Create a Trigger Function to Calculate Flight & Block Times
--- ===============================================================
-CREATE OR REPLACE FUNCTION public.calc_flight_block_times() 
-RETURNS trigger AS $$
-BEGIN
-  -- Calculate flight_time as difference (in hours) between landing_time and takeoff_time.
-  NEW.flight_time := extract(epoch from (NEW.landing_time - NEW.takeoff_time)) / 3600.0;
-  
-  -- Calculate block_time as difference (in hours) between block_on_time and block_off_time.
-  NEW.block_time := extract(epoch from (NEW.block_on_time - NEW.block_off_time)) / 3600.0;
-  
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_calc_flight_block_times
-BEFORE INSERT OR UPDATE ON public.logbook
-FOR EACH ROW
-EXECUTE FUNCTION public.calc_flight_block_times();
+  CONSTRAINT fk_logbook_profile FOREIGN KEY (profile_id) REFERENCES public.profiles(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT fk_logbook_resource FOREIGN KEY (resource_id) REFERENCES public.resources(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT fk_logbook_pic FOREIGN KEY (pic_id) REFERENCES public.profiles(id) ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT fk_logbook_student FOREIGN KEY (student_id) REFERENCES public.profiles(id) ON UPDATE CASCADE ON DELETE CASCADE
+) TABLESPACE pg_default;
 
 ALTER TABLE public.logbook ENABLE ROW LEVEL SECURITY;
 
@@ -245,6 +204,23 @@ CREATE POLICY logbook_rls ON public.logbook
   );
 
 -- ===============================================================
+-- 8.1 Create Trigger Function to Calculate Flight & Block Times
+-- ===============================================================
+CREATE OR REPLACE FUNCTION public.calc_flight_block_times() 
+RETURNS trigger AS $$
+BEGIN
+  NEW.flight_time := extract(epoch from (NEW.landing_time - NEW.takeoff_time)) / 3600.0;
+  NEW.block_time := extract(epoch from (NEW.block_on_time - NEW.block_off_time)) / 3600.0;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql STABLE;
+
+CREATE TRIGGER trg_calc_flight_block_times
+BEFORE INSERT OR UPDATE ON public.logbook
+FOR EACH ROW
+EXECUTE FUNCTION public.calc_flight_block_times();
+
+-- ===============================================================
 -- 8.2 Create a Helper Function to Format Hours as "hh:mm"
 -- ===============================================================
 CREATE OR REPLACE FUNCTION public.format_hours(total numeric)
@@ -255,80 +231,122 @@ DECLARE
 BEGIN
   hrs := floor(total);
   mins := round((total - hrs) * 60);
-  RETURN hrs || ':' || lpad(mins::text, 2, '0');
+  RETURN lpad(hrs::text,2,'0') || ':' || lpad(mins::text,2,'0');
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
 -- ===============================================================
--- 8.3 Create a Trigger Function to Update Flight Hours Summary
+-- 8.3 Create a Function to Aggregate Logbook Data and Update Aggregated Stats
 -- ===============================================================
-CREATE OR REPLACE FUNCTION public.update_flight_hours_summary()
-RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION public.update_aggregated_stats(profile uuid)
+RETURNS void AS $$
 DECLARE
-  total_profile_hours numeric;
-  total_resource_hours numeric;
+  landings_json JSONB;
+  flighthours_json JSONB;
 BEGIN
-  -- Update Profile: Sum flight_time for this profile.
-  SELECT COALESCE(SUM(flight_time), 0)
-  INTO total_profile_hours
-  FROM public.logbook
-  WHERE profile_id = COALESCE(NEW.profile_id, OLD.profile_id);
+  WITH landings_agg AS (
+    SELECT 
+      resource_id,
+      SUM(CASE WHEN flight_date >= current_date - INTERVAL '30 days' THEN landings ELSE 0 END) AS last_month,
+      SUM(CASE WHEN flight_date >= current_date - INTERVAL '90 days' THEN landings ELSE 0 END) AS last_90_days,
+      SUM(CASE WHEN flight_date >= current_date - INTERVAL '180 days' THEN landings ELSE 0 END) AS last_6m,
+      SUM(CASE WHEN flight_date >= current_date - INTERVAL '365 days' THEN landings ELSE 0 END) AS last_year,
+      SUM(landings) AS total
+    FROM public.logbook
+    WHERE profile_id = profile
+    GROUP BY resource_id
+  )
+  SELECT COALESCE(json_object_agg(resource_id, 
+         json_build_object(
+           'last_month', last_month,
+           'last_90_days', last_90_days,
+           'last_6_months', last_6m,
+           'last_year', last_year,
+           'total', total
+         )), '{}'::jsonb)
+  INTO landings_json
+  FROM landings_agg;
+
+  WITH flighthours_agg AS (
+    SELECT 
+      to_char(flight_date, 'YYYY-MM') AS month,
+      SUM(flight_time) AS total_flight_time
+    FROM public.logbook
+    WHERE profile_id = profile
+      AND flight_date >= current_date - INTERVAL '1 year'
+    GROUP BY to_char(flight_date, 'YYYY-MM')
+  )
+  SELECT COALESCE(
+           json_build_object(
+             'monthly', json_object_agg(month, total_flight_time),
+             'total_last_year', SUM(total_flight_time)
+           ), '{}'::jsonb)
+  INTO flighthours_json
+  FROM flighthours_agg;
 
   UPDATE public.profiles
-  SET flight_hours = jsonb_build_object('resources', public.format_hours(total_profile_hours))
-  WHERE id = COALESCE(NEW.profile_id, OLD.profile_id);
+  SET aggregated_stats = json_build_object(
+      'landings', json_build_object('resources', landings_json),
+      'flightHours', flighthours_json
+    )
+  WHERE id = profile;
+END;
+$$ LANGUAGE plpgsql;
 
-  -- Update Resource: Sum flight_time for this resource.
-  SELECT COALESCE(SUM(flight_time), 0)
-  INTO total_resource_hours
-  FROM public.logbook
-  WHERE resource_id = COALESCE(NEW.resource_id, OLD.resource_id);
-
-  UPDATE public.resources
-  SET total_hours = total_resource_hours
-  WHERE id = COALESCE(NEW.resource_id, OLD.resource_id);
-
+-- ===============================================================
+-- 8.4 Create a Trigger Function to Call update_aggregated_stats
+-- ===============================================================
+CREATE OR REPLACE FUNCTION public.trigger_update_aggregated_stats()
+RETURNS trigger AS $$
+DECLARE
+  v_profile uuid;
+BEGIN
+  IF (TG_OP = 'DELETE') THEN
+    v_profile := OLD.profile_id;
+  ELSE
+    v_profile := NEW.profile_id;
+  END IF;
+  PERFORM public.update_aggregated_stats(v_profile);
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
 -- ===============================================================
--- 8.4 Create Triggers to Update Flight Hours Summary on Logbook Changes
+-- 8.5 Create Triggers for Updating Aggregated Stats on Logbook Changes
 -- ===============================================================
-CREATE TRIGGER trg_update_flight_hours_summary_after_insert
+CREATE TRIGGER trg_update_aggregated_stats_after_insert
 AFTER INSERT ON public.logbook
 FOR EACH ROW
-EXECUTE FUNCTION public.update_flight_hours_summary();
+EXECUTE FUNCTION public.trigger_update_aggregated_stats();
 
-CREATE TRIGGER trg_update_flight_hours_summary_after_update
+CREATE TRIGGER trg_update_aggregated_stats_after_update
 AFTER UPDATE ON public.logbook
 FOR EACH ROW
-EXECUTE FUNCTION public.update_flight_hours_summary();
+EXECUTE FUNCTION public.trigger_update_aggregated_stats();
 
-CREATE TRIGGER trg_update_flight_hours_summary_after_delete
+CREATE TRIGGER trg_update_aggregated_stats_after_delete
 AFTER DELETE ON public.logbook
 FOR EACH ROW
-EXECUTE FUNCTION public.update_flight_hours_summary();
+EXECUTE FUNCTION public.trigger_update_aggregated_stats();
 
 -- ===============================================================
 -- 9. Create the Flightplans Table and its RLS Policies
 -- ===============================================================
+DROP TABLE IF EXISTS public.flightplans CASCADE;
 CREATE TABLE IF NOT EXISTS public.flightplans (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    profile_id uuid NOT NULL default auth.uid (),  -- Profile who created the plan
+    profile_id uuid NOT NULL DEFAULT auth.uid(),
     route text NOT NULL,
     notes text,
     created_at TIMESTAMP with time zone NOT NULL DEFAULT now(),
     updated_at TIMESTAMP with time zone NOT NULL DEFAULT now(),
-    international BOOLEAN NULL,
+    international BOOLEAN,
     CONSTRAINT fk_flightplan_creator FOREIGN KEY (profile_id)
         REFERENCES public.profiles(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
-
 ALTER TABLE public.flightplans ENABLE ROW LEVEL SECURITY;
-
 CREATE POLICY flightplans_rls ON public.flightplans
   FOR ALL
   USING (
@@ -343,18 +361,19 @@ CREATE POLICY flightplans_rls ON public.flightplans
 -- ===============================================================
 -- 10. Create the Bookings Table and its RLS Policies
 -- ===============================================================
+DROP TABLE IF EXISTS public.bookings CASCADE;
 CREATE TABLE IF NOT EXISTS public.bookings (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    profile_id uuid NOT NULL default auth.uid (),    -- The person making the booking
-    resource_id uuid NOT NULL,    -- References public.resources.id
-    instructor_id uuid NULL,     -- References public.instructors.id
+    profile_id uuid NOT NULL DEFAULT auth.uid(),
+    resource_id uuid NOT NULL,
+    instructor_id uuid,
     start_time TIMESTAMP with time zone NOT NULL,
     end_time TIMESTAMP with time zone NOT NULL,
     created_at TIMESTAMP with time zone NOT NULL DEFAULT now(),
     updated_at TIMESTAMP with time zone NOT NULL DEFAULT now(),
-    title text null,
-    notes text null,
-    flight_type jsonb not null,
+    title text,
+    notes text,
+    flight_type jsonb NOT NULL,
     CONSTRAINT fk_booking_profile FOREIGN KEY (profile_id)
         REFERENCES public.profiles(id)
         ON DELETE CASCADE
@@ -368,9 +387,7 @@ CREATE TABLE IF NOT EXISTS public.bookings (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
-
 ALTER TABLE public.bookings ENABLE ROW LEVEL SECURITY;
-
 CREATE POLICY bookings_rls ON public.bookings
   FOR ALL
   USING (
@@ -381,8 +398,6 @@ CREATE POLICY bookings_rls ON public.bookings
     public.is_admin() OR
     profile_id = auth.uid()
   );
-
--- Allow all users to read bookings.
 CREATE POLICY bookings_select_rls ON public.bookings
   FOR SELECT
   USING (true);
@@ -390,9 +405,10 @@ CREATE POLICY bookings_select_rls ON public.bookings
 -- ===============================================================
 -- 11. Create the Blogs Table and its RLS Policies
 -- ===============================================================
+DROP TABLE IF EXISTS public.blogs CASCADE;
 CREATE TABLE IF NOT EXISTS public.blogs (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    profile_id uuid NOT NULL default auth.uid (),
+    profile_id uuid NOT NULL DEFAULT auth.uid(),
     title VARCHAR(255) NOT NULL,
     content text NOT NULL,
     published_at TIMESTAMP with time zone DEFAULT NULL,
@@ -403,9 +419,7 @@ CREATE TABLE IF NOT EXISTS public.blogs (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
-
 ALTER TABLE public.blogs ENABLE ROW LEVEL SECURITY;
-
 CREATE POLICY blogs_rls ON public.blogs
   FOR ALL
   USING (
@@ -416,8 +430,6 @@ CREATE POLICY blogs_rls ON public.blogs
     public.is_admin() OR
     profile_id = auth.uid()
   );
-
--- Allow all users to read blogs.
 CREATE POLICY blogs_select_rls ON public.blogs
   FOR SELECT
   USING (true);
