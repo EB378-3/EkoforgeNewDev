@@ -12,7 +12,6 @@ import AnalyticsIcon from '@mui/icons-material/Analytics';
 import SchoolIcon from '@mui/icons-material/School';
 import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket';
 import GppMaybeIcon from '@mui/icons-material/GppMaybe';
-import AirplanemodeActiveIcon from '@mui/icons-material/AirplanemodeActive';
 import ConnectingAirportsIcon from '@mui/icons-material/ConnectingAirports';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import RuleIcon from '@mui/icons-material/Rule';

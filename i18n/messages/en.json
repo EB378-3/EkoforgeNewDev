@@ -89,7 +89,40 @@
     "email": "Email",
     "phone": "Phone",
     "address": "Address",
-    "role": "Role"
+    "role": "Role",
+    "section": {
+      "title": "Announcements & Discussion"
+    },
+    "section1": {
+      "title": "WhatsApp Groups",
+      "linkInfo": "MIK info (Announcements, equipment info etc.)",
+      "linkInfoUrl": "https://chat.whatsapp.com/H7ORSRxQMQjInO4hwjN8ER",
+      "linkChat": "MIK pulinajakso (Members discussion)",
+      "linkChatUrl": "https://chat.whatsapp.com/ICDocWfKA6xCbDWwKOZAmU"
+    },
+    "section2": {
+      "title": "Email Announcements",
+      "ihq": "IHQ announcements",
+      "ihqUrl": "https://groups.google.com/a/mik.fi/forum/#!forum/ihq-info",
+      "stl": "STL announcements",
+      "stlUrl": "https://groups.google.com/a/mik.fi/forum/#!forum/stl-info"
+    },
+    "section3": {
+      "title": "Electronic flight log and billing",
+      "body1": "All flights must be recorded in the aircraft's travel logbook and electronic flight log at",
+      "logbook": "www.mik.fi/kirja",
+      "logbookUrl": "http://www.mik.fi/kirja",
+      "body2": "Enter information immediately after the flight and double-check the details. Billing is done monthly via email. Ensure your email address is up to date.",
+      "body3": "We reconcile the aircraft book with the electronic log at least monthly. Ensure correct calculation of flight and total times. Student and instructor must verify block times match with training records."
+    },
+    "section4": {
+      "title": "Personal accounts",
+      "body": "The club website now uses the same login credentials as the booking system. If using a shared computer, do not select 'stay logged in' when logging in."
+    },
+    "section5": {
+      "title": "Booking and Discussion Forum & Member News",
+      "body": "Booking and discussion forums are available in the Members menu on the left. Member news is visible on the Home / Current page after logging in."
+    }    
   },
   "AboutUs":{
     "title": "About Us",
@@ -221,5 +254,5 @@
     "error": {
       "fetchInternationalFlightPlans": "An error occurred while fetching international flight plans."
     }
-  }  
+  }
 }

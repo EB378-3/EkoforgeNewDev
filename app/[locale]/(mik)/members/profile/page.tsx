@@ -10,6 +10,12 @@ import {
   CardMedia,
   CardActions,
   Avatar,
+  Paper,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+  Link,
 } from "@mui/material";
 import {
   useGetIdentity,
@@ -124,8 +130,84 @@ export default function ProfilePage() {
               </Grid>
             </Grid>
           </Grid>
+          <Grid item xs={12} md={6}>
+            <Paper elevation={3} sx={{ padding: 3 }}>
+              <Typography variant="h5" gutterBottom>
+                {t("section.title")}
+              </Typography>
+
+              <Divider sx={{ marginY: 2 }} />
+
+              <Typography variant="h6">{t("section1.title")}</Typography>
+              <List>
+                <ListItem>
+                  <ListItemText>
+                    <Link href={t("section1.linkInfoUrl")} target="_blank">
+                      {t("section1.linkInfo")}
+                    </Link>
+                  </ListItemText>
+                </ListItem>
+                <ListItem>
+                  <ListItemText>
+                    <Link href={t("section1.linkChatUrl")} target="_blank">
+                      {t("section1.linkChat")}
+                    </Link>
+                  </ListItemText>
+                </ListItem>
+              </List>
+
+              <Divider sx={{ marginY: 2 }} />
+
+              <Typography variant="h6">{t("section2.title")}</Typography>
+              <List>
+                <ListItem>
+                  <ListItemText>
+                    <Link href={t("section2.ihqUrl")} target="_blank">
+                      {t("section2.ihq")}
+                    </Link>
+                  </ListItemText>
+                </ListItem>
+                <ListItem>
+                  <ListItemText>
+                    <Link href={t("section2.stlUrl")} target="_blank">
+                      {t("section2.stl")}
+                    </Link>
+                  </ListItemText>
+                </ListItem>
+              </List>
+
+              <Divider sx={{ marginY: 2 }} />
+
+              <Typography variant="h6">{t("section3.title")}</Typography>
+              <Typography variant="body1" paragraph>
+                {t("section3.body1")} <Link href={t("section3.logbookUrl")} target="_blank">{t("section3.logbook")}</Link>. {t("section3.body2")}
+              </Typography>
+
+              <Typography variant="body2" paragraph>
+                {t("section3.body3")}
+              </Typography>
+
+              <Divider sx={{ marginY: 2 }} />
+
+              <Typography variant="h6">{t("section4.title")}</Typography>
+              <Typography variant="body1" paragraph>
+                {t("section4.body")}
+              </Typography>
+
+              <Divider sx={{ marginY: 2 }} />
+
+              <Typography variant="h6">{t("section5.title")}</Typography>
+              <Typography variant="body1" paragraph>
+                {t("section5.body")}
+              </Typography>
+            </Paper>
+          </Grid>
         </Grid>
       )}
     </Box>
   );
 }
+
+
+    
+      

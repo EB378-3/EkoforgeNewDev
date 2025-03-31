@@ -9,6 +9,7 @@ import {
   CircularProgress,
   Alert,
   Link as MuiLink,
+  Grid,
 } from "@mui/material";
 import { List, EditButton, ShowButton, DeleteButton } from "@refinedev/mui";
 import { useTable } from "@refinedev/core";
@@ -16,7 +17,7 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useTranslations } from "next-intl";
 import { useColorMode } from "@contexts/color-mode";
 import { getTheme } from "@theme/theme";
-import Link from "next/link";
+import Image from "next/image";
 
 interface SectionProps {
   title: string;
@@ -94,7 +95,6 @@ export default function InternationalFlightPlanningPage() {
   const rowsIntl = tableQueryResultIntl?.data?.data ?? [];
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: t("dataGrid.id"), width: 150 },
     { field: "route", headerName: t("dataGrid.route"), width: 250 },
     { field: "notes", headerName: t("dataGrid.notes"), width: 200 },
     {
@@ -129,16 +129,84 @@ export default function InternationalFlightPlanningPage() {
   ];
 
   return (
-    <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: { xs: "100%", md: "80%" }, mx: "auto" }}>
+    <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: { xs: "100%", md: "100%" }, mx: "auto" }}>
       <Typography variant="h4" gutterBottom>
         {t("title")}
       </Typography>
 
       {/* Section 1: No link */}
-      <Section
-        title={t("section1.title")}
-        content={t("section1.content")}
-      />
+      <Paper
+        sx={{
+          p: { xs: 2, md: 3 },
+          mb: 3,
+          borderRadius: 2,
+          boxShadow: 1,
+        }}
+      >
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={8}>
+            <Typography variant="h6" gutterBottom>
+            {t("section1.title")}
+            </Typography>
+            <Typography variant="body1" sx={{ whiteSpace: "pre-line" }}>
+            {t("section1.content")}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Image
+              src="/europe-ranget.jpg"
+              alt={t("section1.title")}
+              width={200}
+              height={300}
+            />
+          </Grid>
+        </Grid>
+      </Paper>
+
+      {/* International Flight Plans Table */}
+      <Paper
+        sx={{
+          p: { xs: 2, md: 3 },
+          my: 3,
+          borderRadius: 2,
+          boxShadow: 1,
+        }}
+      >
+        <Typography variant="h5" gutterBottom>
+          {t("internationalFlightPlans")}
+        </Typography>
+        {tableQueryResultIntl.isLoading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+            <CircularProgress />
+          </Box>
+        ) : tableQueryResultIntl.isError ? (
+          <Alert severity="error">
+            {t("error.fetchInternationalFlightPlans")}
+          </Alert>
+        ) : (
+          <List title={t("internationalFlightPlans")}>
+            <DataGrid
+              autoHeight
+              rows={rowsIntl}
+              columns={columns}
+              rowCount={totalIntl}
+              pageSizeOptions={[5, 10, 20, 30, 50, 100]}
+              pagination
+              paginationModel={{ page: currentIntl - 1, pageSize: pageSizeIntl }}
+              onPaginationModelChange={(model) => {
+                setCurrentIntl(model.page + 1);
+                setPageSizeIntl(model.pageSize);
+              }}
+              sx={{
+                border: "none",
+                "& .MuiDataGrid-cell": {
+                  borderBottom: "none",
+                },
+              }}
+            />
+          </List>
+        )}
+      </Paper>
 
       {/* Section 2 */}
       <Section
@@ -195,51 +263,6 @@ export default function InternationalFlightPlanningPage() {
         linkText={t("section8.linkText")}
         linkUrl={t("section8.linkUrl")}
       />
-
-      {/* International Flight Plans Table */}
-      <Paper
-        sx={{
-          p: { xs: 2, md: 3 },
-          mt: 3,
-          borderRadius: 2,
-          boxShadow: 1,
-        }}
-      >
-        <Typography variant="h5" gutterBottom>
-          {t("internationalFlightPlans")}
-        </Typography>
-        {tableQueryResultIntl.isLoading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-            <CircularProgress />
-          </Box>
-        ) : tableQueryResultIntl.isError ? (
-          <Alert severity="error">
-            {t("error.fetchInternationalFlightPlans")}
-          </Alert>
-        ) : (
-          <List title={t("internationalFlightPlans")}>
-            <DataGrid
-              autoHeight
-              rows={rowsIntl}
-              columns={columns}
-              rowCount={totalIntl}
-              pageSizeOptions={[5, 10, 20, 30, 50, 100]}
-              pagination
-              paginationModel={{ page: currentIntl - 1, pageSize: pageSizeIntl }}
-              onPaginationModelChange={(model) => {
-                setCurrentIntl(model.page + 1);
-                setPageSizeIntl(model.pageSize);
-              }}
-              sx={{
-                border: "none",
-                "& .MuiDataGrid-cell": {
-                  borderBottom: "none",
-                },
-              }}
-            />
-          </List>
-        )}
-      </Paper>
     </Box>
   );
 }
